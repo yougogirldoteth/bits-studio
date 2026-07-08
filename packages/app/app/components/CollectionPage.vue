@@ -76,7 +76,7 @@ useSeoMeta({
   ogUrl: () => pageUrl.value,
   ogImage: () => imageUrl.value,
   ogImageWidth: '1200',
-  ogImageHeight: '1200',
+  ogImageHeight: '630',
   twitterCard: 'summary_large_image',
   twitterTitle: () => pageTitle.value,
   twitterDescription: () => pageDescription.value,

@@ -34,6 +34,9 @@ importers:
       reka-ui:
         specifier: 2.9.9
         version: 2.9.9(vue@3.5.35(typescript@5.8.3))
+      sharp:
+        specifier: 0.33.5
+        version: 0.33.5
       viem:
         specifier: 2.48.4
         version: 2.48.4(typescript@5.8.3)(zod@3.25.76)

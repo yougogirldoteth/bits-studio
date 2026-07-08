@@ -3,11 +3,14 @@ import {
   type BitsCollectionResponse,
 } from '@bits-collection/shared'
 import { grid, type Img } from '@visualizevalue/img-grid'
+import sharp from 'sharp'
 
-const GRID_BACKGROUND = '#ffffff'
-const GRID_MAX_WIDTH = 1200
-const GRID_PADDING = 72
-const GRID_GUTTER = 0
+const OG_WIDTH = 1200
+const OG_HEIGHT = 630
+const GRID_BACKGROUND = '#050505'
+const GRID_MAX_WIDTH = 630
+const GRID_PADDING = 71
+const GRID_GUTTER = 8
 const BLANK_IMAGE =
   'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/%3E'
 
@@ -27,13 +30,31 @@ export async function renderCollectionOgGrid(
 
   if (images.length === 0) return null
 
-  return await grid(squarePaddedImages(images), {
+  const gridImage = await grid(squarePaddedImages(images), {
     maxWidth: GRID_MAX_WIDTH,
     background: GRID_BACKGROUND,
     padding: GRID_PADDING,
     gutter: GRID_GUTTER,
     pixelated: false,
   })
+
+  return await sharp({
+    create: {
+      width: OG_WIDTH,
+      height: OG_HEIGHT,
+      channels: 4,
+      background: GRID_BACKGROUND,
+    },
+  })
+    .composite([
+      {
+        input: gridImage,
+        left: Math.floor((OG_WIDTH - GRID_MAX_WIDTH) / 2),
+        top: Math.floor((OG_HEIGHT - GRID_MAX_WIDTH) / 2),
+      },
+    ])
+    .png()
+    .toBuffer()
 }
 
 function squarePaddedImages(images: Img[]): Img[] {

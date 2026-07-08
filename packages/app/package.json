@@ -20,6 +20,7 @@
     "@visualizevalue/img-grid": "^0.1.4",
     "nuxt": "^4.4.6",
     "reka-ui": "2.9.9",
+    "sharp": "0.33.5",
     "viem": "2.48.4",
     "vue": "3.5.35"
   },
