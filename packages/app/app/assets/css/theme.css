@@ -171,7 +171,7 @@ dialog {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: clamp(1rem, 2vw, 2rem);
-  align-items: start;
+  align-items: center;
   border-block-end: 1px solid var(--bits-rule);
   padding-block-end: clamp(1rem, 2vw, 1.5rem);
 }
@@ -183,10 +183,10 @@ dialog {
 
 .bits-brand__name {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 5.8rem);
+  font-size: clamp(1.75rem, 2.2vw, 2.75rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 0.98;
+  line-height: 1.02;
 }
 
 .bits-brand__meta,
@@ -198,6 +198,7 @@ dialog {
 }
 
 .bits-wallet {
+  align-self: center;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
