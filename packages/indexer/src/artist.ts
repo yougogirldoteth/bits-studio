@@ -1,4 +1,5 @@
 import { ownableAbi, type BitsCollectionConfig } from '@bits-collection/shared'
+import { zeroAddress } from 'viem'
 import { getEnsName } from 'viem/actions'
 import type { Address, PublicClient } from 'viem'
 
@@ -17,6 +18,8 @@ export async function resolveOnchainArtist(
 }
 
 async function readOwner(client: PublicClient, address: Address) {
+  if (address === zeroAddress) return null
+
   try {
     return await client.readContract({
       address,
