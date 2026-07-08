@@ -1,6 +1,6 @@
 # Deploy
 
-The repo mirrors the app/indexer split used by `hello-world-computer`.
+This repo deploys the frontend and indexer as separate Kamal services.
 
 ## Services
 
