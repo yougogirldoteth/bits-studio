@@ -49,6 +49,7 @@ export type BitsCollectionSummary = {
   priceLabel: string
   launchLabel: string
   explorerUrl: string
+  artistUrl?: string
   theme?: BitsCollectionTheme
 }
 

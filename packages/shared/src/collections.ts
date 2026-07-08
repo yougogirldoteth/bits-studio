@@ -4,7 +4,7 @@ export const bitsCollections = [
   {
     slug: 'drums-collection-1',
     title: 'Drums Collection 1',
-    artist: 'BITS',
+    artist: '',
     description:
       'Sixteen onchain drum instruments rendered by the BITS collection renderer.',
     chain: 'mainnet',

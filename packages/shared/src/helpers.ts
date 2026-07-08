@@ -68,11 +68,14 @@ export function eventId(event: {
 export function createCollectionSummary(
   collection: BitsCollectionConfig,
   minted: bigint,
+  options: { artist?: string } = {},
 ): BitsCollectionSummary {
+  const artist = options.artist ?? collection.artist
+
   return {
     slug: collection.slug,
     title: collection.title,
-    artist: collection.artist,
+    artist,
     description: collection.description,
     chain: collection.chain,
     chainId: collection.chainId,
@@ -86,6 +89,9 @@ export function createCollectionSummary(
     priceLabel: formatWeiLabel(collection.pricePerTokenWei),
     launchLabel: collection.launchLabel,
     explorerUrl: collectionExplorerUrl(collection),
+    artistUrl: artist
+      ? `${collection.explorerBaseUrl}/address/${artist}`
+      : undefined,
     theme: collection.theme,
   }
 }

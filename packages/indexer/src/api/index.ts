@@ -4,6 +4,8 @@ import { client, graphql } from 'ponder'
 import { asc, count, desc, eq } from 'ponder'
 import { db } from 'ponder:api'
 import schema, { bitsActivity, bitsCollection, bitsToken } from 'ponder:schema'
+import { createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
 import {
   bitsCollections,
   createCollectionSummary,
@@ -13,9 +15,16 @@ import {
   type BitsCollectionConfig,
   type BitsTokenSummary,
 } from '@bits-collection/shared'
+import { resolveOnchainArtist } from '../artist.ts'
 
 const app = new Hono()
 const MAX_LIMIT = 100
+const artistRpcUrl = process.env.PONDER_RPC_URLS_1?.split(',').find(Boolean)
+const artistClient = createPublicClient({
+  chain: mainnet,
+  transport: artistRpcUrl ? http(artistRpcUrl) : http(),
+})
+const artistCache = new Map<string, Promise<string>>()
 
 type CollectionRow = typeof bitsCollection.$inferSelect
 type TokenRow = typeof bitsToken.$inferSelect
@@ -35,11 +44,29 @@ function rowMinted(row: CollectionRow | null | undefined) {
   return row?.minted ?? 0n
 }
 
-function collectionSummary(
+async function resolveCollectionArtist(
   config: BitsCollectionConfig,
   row?: CollectionRow | null,
 ) {
-  return createCollectionSummary(config, rowMinted(row))
+  if (!artistCache.has(config.slug)) {
+    artistCache.set(
+      config.slug,
+      resolveOnchainArtist(artistClient, config, row?.renderer_contract).catch(
+        () => row?.artist || config.artist,
+      ),
+    )
+  }
+
+  return artistCache.get(config.slug)!
+}
+
+async function collectionSummary(
+  config: BitsCollectionConfig,
+  row?: CollectionRow | null,
+) {
+  return createCollectionSummary(config, rowMinted(row), {
+    artist: await resolveCollectionArtist(config, row),
+  })
 }
 
 function tokenSummary(row: TokenRow): BitsTokenSummary {
@@ -104,8 +131,10 @@ app.get('/collections', async (c) => {
   const rowsBySlug = new Map(rows.map((row) => [row.slug, row]))
 
   return c.json({
-    items: bitsCollections.map((collection) =>
-      collectionSummary(collection, rowsBySlug.get(collection.slug)),
+    items: await Promise.all(
+      bitsCollections.map((collection) =>
+        collectionSummary(collection, rowsBySlug.get(collection.slug)),
+      ),
     ),
   })
 })
@@ -121,7 +150,7 @@ app.get('/collections/:slug', async (c) => {
   ])
 
   return c.json({
-    collection: collectionSummary(config, collectionRow),
+    collection: await collectionSummary(config, collectionRow),
     tokens: tokens.map(tokenSummary),
   })
 })

@@ -22,3 +22,5 @@ export const bitsRendererV1Abi = parseAbi([
   'function tokenToHtml(uint256 tokenId) view returns (string)',
   'function tokenToSvg(uint256 tokenId) view returns (string)',
 ])
+
+export const ownableAbi = parseAbi(['function owner() view returns (address)'])

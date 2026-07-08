@@ -18,13 +18,14 @@ import {
   bitsCollection,
   bitsToken,
 } from 'ponder:schema'
-import { zeroAddress, type Address } from 'viem'
+import { zeroAddress, type Address, type PublicClient } from 'viem'
 import {
   INDEXED_COLLECTIONS,
   balanceRowId,
   contractNameForCollection,
   tokenRowId,
 } from '../utils/collections.ts'
+import { resolveOnchainArtist } from './artist.ts'
 
 type PonderContext = Context
 type PonderEvent = {
@@ -64,13 +65,18 @@ async function ensureCollection(
   timestamp: bigint,
 ) {
   const state = await readCollectionState(context, collection)
+  const artist = await resolveOnchainArtist(
+    context.client as PublicClient,
+    collection,
+    state.renderer,
+  )
 
   await context.db
     .insert(bitsCollection)
     .values({
       slug: collection.slug,
       title: collection.title,
-      artist: collection.artist,
+      artist,
       chain_id: collection.chainId,
       collection_id: collection.collectionId,
       bits_contract: collection.bitsContract,
@@ -90,7 +96,7 @@ async function ensureCollection(
 
   await context.db.update(bitsCollection, { slug: collection.slug }).set({
     title: collection.title,
-    artist: collection.artist,
+    artist,
     chain_id: collection.chainId,
     collection_id: collection.collectionId,
     bits_contract: collection.bitsContract,
