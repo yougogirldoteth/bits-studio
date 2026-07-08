@@ -1,14 +1,14 @@
 :root {
-  color-scheme: light;
-  --bits-bg: #ffffff;
-  --bits-ink: #050505;
-  --bits-muted: #777777;
-  --bits-soft: #f5f5f2;
-  --bits-rule: rgba(5, 5, 5, 0.14);
-  --bits-rule-strong: rgba(5, 5, 5, 0.36);
-  --bits-accent: #111111;
-  --bits-error: #b42318;
-  --bits-success: #16703a;
+  color-scheme: dark;
+  --bits-bg: #050505;
+  --bits-ink: #f4f1ea;
+  --bits-muted: #8e8b84;
+  --bits-soft: #10100f;
+  --bits-rule: rgba(244, 241, 234, 0.16);
+  --bits-rule-strong: rgba(244, 241, 234, 0.42);
+  --bits-accent: #f4f1ea;
+  --bits-error: #ff6b5f;
+  --bits-success: #62d18f;
   --bits-gutter: clamp(1rem, 2vw, 2.25rem);
   --bits-page-gap: clamp(1.05rem, 1.8vw, 1.7rem);
   --bits-stack-gap: 0.7rem;
@@ -48,6 +48,18 @@
   --button-primary-color: var(--bits-bg);
   --card-background: var(--bits-bg);
   --card-background-highlight: var(--bits-soft);
+  --backdrop-background-color: rgba(0, 0, 0, 0.72);
+  --gray-z-0: #090909;
+  --gray-z-1: #10100f;
+  --gray-z-2: #171615;
+  --gray-z-3: #20201e;
+  --gray-z-4: #2a2927;
+  --gray-z-5: #3a3834;
+  --gray-z-6: #555149;
+  --gray-z-7: #777166;
+  --gray-z-8: #aaa398;
+  --gray-z-9: #d8d2c8;
+  --gray-z-10: #f4f1ea;
 }
 
 * {
@@ -152,10 +164,15 @@ iframe {
 
 dialog {
   margin: auto;
+  border: 1px solid var(--bits-rule-strong);
+  background: var(--bits-bg);
+  color: var(--bits-ink);
 }
 
 .toast {
   border-radius: 0;
+  background: var(--bits-bg);
+  color: var(--bits-ink);
   font-family: inherit;
 }
 
@@ -169,7 +186,7 @@ dialog {
 }
 
 .evm-profile button.danger:is(:hover, :active, :focus) {
-  background: rgba(180, 35, 24, 0.08);
+  background: rgba(255, 107, 95, 0.12);
   color: var(--bits-error) !important;
 }
 
@@ -354,9 +371,7 @@ a.bits-description-artist:hover {
 .bits-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--bits-rule);
-  border: 1px solid var(--bits-rule);
+  gap: var(--bits-stack-gap);
 }
 
 .bits-token {
@@ -364,6 +379,7 @@ a.bits-description-artist:hover {
   display: grid;
   grid-template-rows: auto minmax(6.2rem, auto) auto;
   gap: 0;
+  border: 1px solid var(--bits-rule);
   background: var(--bits-bg);
 }
 
