@@ -23,21 +23,24 @@
 
       <section class="bits-section bits-hero">
         <div class="bits-copy">
-          <div class="bits-meta bits-artist-line">
-            <span>Artist</span>
-            <a
-              v-if="artistEnsUrl"
-              class="bits-inline-link"
-              :href="artistEnsUrl"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <span>{{ collection.artist }}</span>
-              <Icon name="lucide:external-link" />
-            </a>
-            <strong v-else>{{ collection.artist }}</strong>
-          </div>
-          <p>{{ collection.description }}</p>
+          <p>
+            {{ collection.description }}
+            <template v-if="collection.artist">
+              <span class="bits-description-artist-prefix">- by</span>
+              <a
+                v-if="collection.artistUrl"
+                class="bits-description-artist"
+                :href="collection.artistUrl"
+                rel="noreferrer"
+                target="_blank"
+              >
+                {{ collection.artist }}
+              </a>
+              <strong v-else class="bits-description-artist">
+                {{ collection.artist }}
+              </strong>
+            </template>
+          </p>
           <div class="bits-meta bits-launch-line">
             <span>{{ collection.launchLabel }}</span>
             <a
@@ -150,11 +153,6 @@ const connectButton = ref<{ open: () => void } | null>(null)
 const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
-)
-const artistEnsUrl = computed(() =>
-  props.collection.artist.toLowerCase().endsWith('.eth')
-    ? `https://app.ens.domains/${props.collection.artist}`
-    : '',
 )
 
 watch(

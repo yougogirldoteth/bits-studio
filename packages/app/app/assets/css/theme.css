@@ -261,16 +261,15 @@ dialog {
   line-height: 1.36;
 }
 
-.bits-artist-line {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.5rem;
-  align-items: center;
-}
-
-.bits-artist-line strong {
+.bits-description-artist {
   color: var(--bits-ink);
   font: inherit;
+  margin-inline-start: 0.2em;
+}
+
+.bits-description-artist-prefix {
+  color: var(--bits-muted);
+  margin-inline-start: 0.2em;
 }
 
 .bits-launch-line {
