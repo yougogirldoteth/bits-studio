@@ -181,7 +181,7 @@ async function flushPendingMintIntent() {
 
   await nextTick()
 
-  if (!props.address || !pendingMintIntent.value) return
+  if (!pendingMintIntent.value) return
 
   const intent = pendingMintIntent.value
   pendingMintIntent.value = null
