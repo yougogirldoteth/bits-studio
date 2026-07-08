@@ -9,6 +9,10 @@
   --bits-accent: #111111;
   --bits-error: #b42318;
   --bits-success: #16703a;
+  --bits-gutter: clamp(1rem, 2vw, 2.25rem);
+  --bits-page-gap: clamp(1.05rem, 1.8vw, 1.7rem);
+  --bits-stack-gap: 0.7rem;
+  --bits-card-padding: 0.9rem;
   --bits-control-height: 2.7rem;
 
   --background: var(--bits-bg);
@@ -178,21 +182,23 @@ dialog {
 .bits-shell {
   inline-size: min(100%, 118rem);
   margin-inline: auto;
-  padding: clamp(1rem, 2vw, 2.25rem);
+  display: grid;
+  gap: var(--bits-page-gap);
+  padding: var(--bits-gutter);
 }
 
 .bits-topbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: clamp(1rem, 2vw, 2rem);
+  gap: var(--bits-page-gap);
   align-items: center;
   border-block-end: 1px solid var(--bits-rule);
-  padding-block-end: clamp(1rem, 2vw, 1.5rem);
+  padding-block-end: var(--bits-stack-gap);
 }
 
 .bits-brand {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .bits-brand__name {
@@ -221,22 +227,22 @@ dialog {
 }
 
 .bits-section {
-  padding-block: clamp(1rem, 1.8vw, 1.75rem);
+  min-inline-size: 0;
 }
 
 .bits-hero {
   border-block-end: 1px solid var(--bits-rule);
-  padding-block-end: clamp(1rem, 1.8vw, 1.5rem);
+  padding-block-end: var(--bits-stack-gap);
 }
 
 .bits-mode-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--bits-stack-gap);
   align-items: center;
   justify-content: space-between;
   border-block-end: 1px solid var(--bits-rule);
-  padding-block-end: clamp(1rem, 1.8vw, 1.5rem);
+  padding-block-end: var(--bits-stack-gap);
 }
 
 .bits-button--mint-set {
@@ -252,7 +258,7 @@ dialog {
 .bits-copy {
   max-inline-size: 48rem;
   display: grid;
-  gap: 0.65rem;
+  gap: var(--bits-stack-gap);
 }
 
 .bits-copy p {
@@ -279,7 +285,7 @@ a.bits-description-artist:hover {
 .bits-launch-line {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 0.75rem;
+  gap: 0.35rem var(--bits-stack-gap);
   align-items: center;
 }
 
@@ -307,7 +313,7 @@ a.bits-description-artist:hover {
 
 .bits-stat {
   min-block-size: 4.7rem;
-  padding: 0.95rem;
+  padding: var(--bits-card-padding);
   border-inline-end: 1px solid var(--bits-rule);
 }
 
@@ -322,7 +328,7 @@ a.bits-description-artist:hover {
 }
 
 .bits-stat__value {
-  margin-block-start: 0.45rem;
+  margin-block-start: calc(var(--bits-stack-gap) * 0.65);
   font-size: clamp(1rem, 1.45vw, 1.4rem);
   font-weight: 500;
   line-height: 1.1;
@@ -331,7 +337,7 @@ a.bits-description-artist:hover {
 .bits-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--bits-stack-gap);
   justify-content: flex-end;
 }
 
@@ -404,8 +410,8 @@ a.bits-description-artist:hover {
 .bits-token__body {
   min-block-size: 6.2rem;
   display: grid;
-  gap: 0.65rem;
-  padding: 0.85rem;
+  gap: calc(var(--bits-stack-gap) * 0.9);
+  padding: var(--bits-card-padding);
 }
 
 .bits-token__title {
@@ -419,10 +425,10 @@ a.bits-description-artist:hover {
 .bits-token__footer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.75rem;
+  gap: var(--bits-stack-gap);
   align-items: center;
   border-block-start: 1px solid var(--bits-rule);
-  padding: 0.85rem;
+  padding: var(--bits-card-padding);
 }
 
 .bits-empty,
@@ -465,8 +471,15 @@ a.bits-description-artist:hover {
 }
 
 @media (max-width: 520px) {
+  :root {
+    --bits-gutter: 0.75rem;
+    --bits-page-gap: 1rem;
+    --bits-stack-gap: 0.65rem;
+    --bits-card-padding: 0.8rem;
+  }
+
   .bits-shell {
-    padding: 0.75rem;
+    padding: var(--bits-gutter);
   }
 
   .bits-mode-row {
