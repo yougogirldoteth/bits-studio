@@ -20,7 +20,6 @@
   <TransactionFlow
     ref="transactionFlow"
     chain="mainnet"
-    :request="pendingRequest"
     :text="transactionText"
     @complete="onTransactionComplete"
   />
@@ -34,8 +33,9 @@ const slug = computed(() => String(route.params.slug))
 const indexer = useBitsIndexer()
 const contracts = useBitsContracts()
 const { address } = contracts
-const pendingRequest = shallowRef<(() => Promise<`0x${string}`>) | undefined>()
-const transactionFlow = ref<{ start: () => unknown } | null>(null)
+const transactionFlow = ref<{
+  start: (request: () => Promise<`0x${string}`>) => unknown
+} | null>(null)
 const transactionText = {
   title: {
     confirm: 'Mint',
@@ -44,7 +44,7 @@ const transactionText = {
     complete: 'Minted',
   },
   lead: {
-    confirm: 'Confirm the transaction in your wallet.',
+    confirm: 'Review this mint before sending it to your wallet.',
     requesting: 'Requesting signature.',
     waiting: 'Waiting for Ethereum.',
     complete: 'Mint confirmed.',
@@ -80,19 +80,16 @@ useHead(() => ({
 
 function startCollectionMint() {
   if (!data.value) return
-  pendingRequest.value = contracts.createMintCollectionRequest(
-    data.value.collection,
+  transactionFlow.value?.start(
+    contracts.createMintCollectionRequest(data.value.collection),
   )
-  transactionFlow.value?.start()
 }
 
 function startTokenMint(token: BitsTokenSummary) {
   if (!data.value) return
-  pendingRequest.value = contracts.createMintTokenRequest(
-    data.value.collection,
-    token.tokenId,
+  transactionFlow.value?.start(
+    contracts.createMintTokenRequest(data.value.collection, token.tokenId),
   )
-  transactionFlow.value?.start()
 }
 
 async function onTransactionComplete() {
