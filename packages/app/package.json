@@ -17,6 +17,7 @@
     "@1001-digital/components.evm": "3.6.13",
     "@1001-digital/layers.evm": "^2.7.29",
     "@bits-collection/shared": "workspace:*",
+    "@visualizevalue/img-grid": "^0.1.4",
     "nuxt": "^4.4.6",
     "reka-ui": "2.9.9",
     "viem": "2.48.4",
