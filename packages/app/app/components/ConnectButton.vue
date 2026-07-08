@@ -1,11 +1,16 @@
 <template>
-  <button class="bits-connect" type="button" @click="open">
-    <EvmAccount v-if="connectedAddress" :address="connectedAddress" resolve-ens>
-      <template #default="{ display }">
-        <span>{{ display }}</span>
-      </template>
-    </EvmAccount>
-    <span v-else>Connect</span>
+  <EvmProfile
+    v-if="connectedAddress"
+    class-name="bits-connect"
+    @disconnected="emit('disconnected')"
+  >
+    <template #default="{ display }">
+      <span>{{ display }}</span>
+    </template>
+  </EvmProfile>
+
+  <button v-else class="bits-connect" type="button" @click="open">
+    <span>Connect</span>
   </button>
 
   <Dialog
@@ -24,6 +29,7 @@ import { Dialog } from '@1001-digital/components'
 const emit = defineEmits<{
   connected: []
   closed: []
+  disconnected: []
 }>()
 
 const { address } = useAccount()
