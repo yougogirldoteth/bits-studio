@@ -155,6 +155,20 @@ dialog {
   font-family: inherit;
 }
 
+.evm-profile {
+  --button-background: var(--bits-bg);
+  --button-background-highlight: var(--bits-soft);
+  --button-color: var(--bits-ink);
+  --button-color-highlight: var(--bits-ink);
+  --button-icon-color: var(--bits-muted);
+  --button-icon-color-highlight: var(--bits-ink);
+}
+
+.evm-profile button.danger:is(:hover, :active, :focus) {
+  background: rgba(180, 35, 24, 0.08);
+  color: var(--bits-error) !important;
+}
+
 .bits-page {
   min-block-size: 100dvh;
   display: grid;
