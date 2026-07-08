@@ -1,6 +1,5 @@
 export default defineNuxtConfig({
   extends: ['@1001-digital/layers.evm'],
-  ssr: false,
 
   css: ['~/assets/css/theme.css'],
 
