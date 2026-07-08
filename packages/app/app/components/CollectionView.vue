@@ -42,14 +42,22 @@
             </template>
           </p>
           <div class="bits-meta bits-launch-line">
-            <span>{{ collection.launchLabel }}</span>
             <a
               class="bits-inline-link"
               :href="collection.explorerUrl"
               rel="noreferrer"
               target="_blank"
             >
-              <span>View contract</span>
+              <span>View BITS contract</span>
+              <Icon name="lucide:external-link" />
+            </a>
+            <a
+              class="bits-inline-link"
+              :href="collection.rendererExplorerUrl"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <span>View renderer contract</span>
               <Icon name="lucide:external-link" />
             </a>
           </div>

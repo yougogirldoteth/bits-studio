@@ -54,6 +54,10 @@ export function collectionExplorerUrl(collection: BitsCollectionConfig) {
   return `${collection.explorerBaseUrl}/address/${collection.bitsContract}`
 }
 
+export function rendererExplorerUrl(collection: BitsCollectionConfig) {
+  return `${collection.explorerBaseUrl}/address/${collection.rendererContract}`
+}
+
 export function tokenExplorerUrl(collection: BitsCollectionConfig) {
   return `${collection.explorerBaseUrl}/address/${collection.bitsContract}`
 }
@@ -89,6 +93,7 @@ export function createCollectionSummary(
     priceLabel: formatWeiLabel(collection.pricePerTokenWei),
     launchLabel: collection.launchLabel,
     explorerUrl: collectionExplorerUrl(collection),
+    rendererExplorerUrl: rendererExplorerUrl(collection),
     artistUrl: artist
       ? `${collection.explorerBaseUrl}/address/${artist}`
       : undefined,
