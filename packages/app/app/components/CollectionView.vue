@@ -6,7 +6,7 @@
     <div class="bits-shell">
       <header class="bits-topbar">
         <div class="bits-brand">
-          <p class="bits-brand__meta">{{ collection.artist }}</p>
+          <p class="bits-brand__meta">BITS</p>
           <h1 class="bits-brand__name">{{ collection.title }}</h1>
         </div>
         <div class="bits-wallet">
