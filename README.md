@@ -46,6 +46,17 @@ Drums Collection 1 is configured in `packages/shared/src/collections.ts`:
 - Collection id `1`
 - Token ids `1-16`
 
+## Indexer API
+
+The frontend reads collection data from stable REST routes:
+
+- `/collections`
+- `/collections/:slug`
+- `/collections/:slug/tokens`
+- `/collections/:slug/tokens/:tokenId`
+- `/collections/:slug/holders`
+- `/collections/:slug/activity`
+
 ## Adding Collections
 
 See `docs/add-collection.md`.

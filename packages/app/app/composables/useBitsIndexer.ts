@@ -2,6 +2,7 @@ import type {
   BitsActivityResponse,
   BitsCollectionResponse,
   BitsCollectionsResponse,
+  BitsHoldersResponse,
   BitsTokenResponse,
   BitsTokensResponse,
 } from '@bits-collection/shared'
@@ -81,6 +82,10 @@ export function useBitsIndexer() {
     getActivity: (slug: string, offset = 0, limit = 50) =>
       getJson<BitsActivityResponse>(
         `/collections/${encodeURIComponent(slug)}/activity?offset=${offset}&limit=${limit}`,
+      ),
+    listHolders: (slug: string, offset = 0, limit = 50) =>
+      getJson<BitsHoldersResponse>(
+        `/collections/${encodeURIComponent(slug)}/holders?offset=${offset}&limit=${limit}`,
       ),
   }
 }

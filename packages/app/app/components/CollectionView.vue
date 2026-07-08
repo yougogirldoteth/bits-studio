@@ -87,6 +87,10 @@
         </div>
       </section>
 
+      <section class="bits-section">
+        <HoldersTable :holders="holders" :total="holderTotal" />
+      </section>
+
       <section class="bits-section bits-mode-row">
         <button
           class="bits-button bits-button--primary bits-button--mint-set"
@@ -138,13 +142,17 @@
 <script setup lang="ts">
 import type {
   BitsCollectionSummary,
+  BitsHolderSummary,
   BitsTokenSummary,
 } from '@bits-collection/shared'
+import HoldersTable from '~/components/HoldersTable.vue'
 
 const props = defineProps<{
   collection: BitsCollectionSummary
   tokens: BitsTokenSummary[]
   collections: BitsCollectionSummary[]
+  holders: BitsHolderSummary[]
+  holderTotal: number
   address?: string
 }>()
 

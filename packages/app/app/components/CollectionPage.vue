@@ -4,6 +4,8 @@
     :address="address"
     :collection="data.collection"
     :collections="collections?.items ?? []"
+    :holder-total="holders?.total ?? 0"
+    :holders="holders?.items ?? []"
     :tokens="data.tokens"
     @mint-collection="startCollectionMint"
     @mint-token="startTokenMint"
@@ -55,6 +57,14 @@ const { data, error, refresh } = await useAsyncData(
 
 const { data: collections } = await useAsyncData('collections', () =>
   indexer.listCollections(),
+)
+const { data: holders } = await useAsyncData(
+  () => `holders:${slug.value}`,
+  () =>
+    indexer
+      .listHolders(slug.value, 0, 100)
+      .catch(() => ({ items: [], total: 0 })),
+  { watch: [slug] },
 )
 
 const collection = computed(() => data.value?.collection)

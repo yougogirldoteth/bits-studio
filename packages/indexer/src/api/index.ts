@@ -1,10 +1,15 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { client, graphql } from 'ponder'
-import { asc, count, desc, eq } from 'ponder'
+import { and, asc, count, countDistinct, desc, eq, gt, sql } from 'ponder'
 import { db } from 'ponder:api'
-import schema, { bitsActivity, bitsCollection, bitsToken } from 'ponder:schema'
-import { createPublicClient, http } from 'viem'
+import schema, {
+  bitsActivity,
+  bitsBalance,
+  bitsCollection,
+  bitsToken,
+} from 'ponder:schema'
+import { createPublicClient, getAddress, http, type Address } from 'viem'
 import { mainnet } from 'viem/chains'
 import {
   bitsCollections,
@@ -13,6 +18,7 @@ import {
   tokenAvailable,
   type BitsActivityItem,
   type BitsCollectionConfig,
+  type BitsHolderSummary,
   type BitsTokenSummary,
 } from '@bits-collection/shared'
 import { resolveOnchainArtist } from '../artist.ts'
@@ -25,6 +31,7 @@ const artistClient = createPublicClient({
   transport: artistRpcUrl ? http(artistRpcUrl) : http(),
 })
 const artistCache = new Map<string, Promise<string>>()
+const ensCache = new Map<string, Promise<string | undefined>>()
 
 type CollectionRow = typeof bitsCollection.$inferSelect
 type TokenRow = typeof bitsToken.$inferSelect
@@ -58,6 +65,22 @@ async function resolveCollectionArtist(
   }
 
   return artistCache.get(config.slug)!
+}
+
+async function resolveEnsName(owner: Address) {
+  const key = owner.toLowerCase()
+
+  if (!ensCache.has(key)) {
+    ensCache.set(
+      key,
+      artistClient
+        .getEnsName({ address: owner })
+        .then((name) => name ?? undefined)
+        .catch(() => undefined),
+    )
+  }
+
+  return ensCache.get(key)!
 }
 
 async function collectionSummary(
@@ -106,6 +129,26 @@ function activityItem(row: ActivityRow): BitsActivityItem {
     blockNumber: row.block_number.toString(),
     logIndex: row.log_index,
     timestamp: Number(row.timestamp),
+  }
+}
+
+async function holderSummary(
+  config: BitsCollectionConfig,
+  row: {
+    owner: Address
+    balance: string | number | bigint | null
+    tokenCount: number
+  },
+): Promise<BitsHolderSummary> {
+  const owner = getAddress(row.owner)
+  const ensName = await resolveEnsName(owner)
+
+  return {
+    owner,
+    ensName,
+    balance: BigInt(row.balance ?? 0).toString(),
+    tokenCount: row.tokenCount,
+    explorerUrl: `${config.explorerBaseUrl}/address/${ensName ?? owner}`,
   }
 }
 
@@ -201,6 +244,43 @@ app.get('/collections/:slug/activity', async (c) => {
 
   return c.json({
     items: items.map(activityItem),
+    total: Number(totalRows[0]?.count ?? 0),
+  })
+})
+
+app.get('/collections/:slug/holders', async (c) => {
+  noStore(c)
+  const config = getBitsCollection(c.req.param('slug'))
+  if (!config) return c.json({ error: 'Unknown collection' }, 404)
+
+  const { offset, limit } = parsePagination(c)
+  const totalBalance = sql<string>`sum(${bitsBalance.balance})`
+  const positiveBalanceFilter = and(
+    eq(bitsBalance.collection_slug, config.slug),
+    gt(bitsBalance.balance, 0n),
+  )
+
+  const [items, totalRows] = await Promise.all([
+    db
+      .select({
+        owner: bitsBalance.owner,
+        balance: totalBalance,
+        tokenCount: count(),
+      })
+      .from(bitsBalance)
+      .where(positiveBalanceFilter)
+      .groupBy(bitsBalance.owner)
+      .orderBy(desc(totalBalance))
+      .offset(offset)
+      .limit(limit),
+    db
+      .select({ count: countDistinct(bitsBalance.owner) })
+      .from(bitsBalance)
+      .where(positiveBalanceFilter),
+  ])
+
+  return c.json({
+    items: await Promise.all(items.map((row) => holderSummary(config, row))),
     total: Number(totalRows[0]?.count ?? 0),
   })
 })

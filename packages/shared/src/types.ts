@@ -74,6 +74,14 @@ export type BitsTokenSummary = BitsTokenMetadata & {
   soldOut: boolean
 }
 
+export type BitsHolderSummary = {
+  owner: Address
+  ensName?: string
+  balance: string
+  tokenCount: number
+  explorerUrl: string
+}
+
 export type BitsActivityType = 'mint' | 'transfer' | 'metadata' | 'ownership'
 
 export type BitsActivityItem = {
