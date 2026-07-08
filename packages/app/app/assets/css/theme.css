@@ -62,6 +62,31 @@
   --gray-z-10: #f4f1ea;
 }
 
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bits-bg: #ffffff;
+  --bits-ink: #050505;
+  --bits-muted: #777777;
+  --bits-soft: #f5f5f2;
+  --bits-rule: rgba(5, 5, 5, 0.14);
+  --bits-rule-strong: rgba(5, 5, 5, 0.36);
+  --bits-accent: #111111;
+  --bits-error: #b42318;
+  --bits-success: #16703a;
+  --backdrop-background-color: rgba(0, 0, 0, 0.5);
+  --gray-z-0: #f5f5f5;
+  --gray-z-1: #ededeb;
+  --gray-z-2: #e4e4df;
+  --gray-z-3: #d6d6cf;
+  --gray-z-4: #c6c6bd;
+  --gray-z-5: #a9a99f;
+  --gray-z-6: #8c8c83;
+  --gray-z-7: #707068;
+  --gray-z-8: #4f4f49;
+  --gray-z-9: #292926;
+  --gray-z-10: #050505;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -142,6 +167,38 @@ button {
 .bits-icon-button {
   inline-size: 2.55rem;
   padding-inline: 0;
+}
+
+.bits-theme-toggle {
+  position: fixed;
+  inset-block-end: var(--bits-gutter);
+  inset-inline-end: var(--bits-gutter);
+  z-index: 200;
+  inline-size: var(--bits-control-height);
+  block-size: var(--bits-control-height);
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--bits-rule-strong);
+  border-radius: 0;
+  background: var(--bits-bg);
+  color: var(--bits-ink);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.bits-theme-toggle:hover {
+  border-color: var(--bits-ink);
+  background: var(--bits-ink);
+  color: var(--bits-bg);
+}
+
+.bits-theme-toggle svg {
+  inline-size: 1rem;
+  block-size: 1rem;
 }
 
 a {
