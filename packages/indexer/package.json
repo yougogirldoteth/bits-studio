@@ -1,0 +1,37 @@
+{
+  "name": "@bits-collection/indexer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "ponder dev",
+    "start": "ponder start",
+    "serve": "ponder serve",
+    "db": "ponder db",
+    "codegen": "ponder codegen",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "kamal:setup": "set -a && . ./.env.production && set +a && kamal setup",
+    "kamal:deploy": "set -a && . ./.env.production && set +a && kamal deploy",
+    "kamal:sh": "set -a && . ./.env.production && set +a && kamal app exec -i --reuse sh"
+  },
+  "dependencies": {
+    "@bits-collection/shared": "workspace:*",
+    "@ponder/utils": "^0.2.18",
+    "abitype": "^1.0.0",
+    "drizzle-orm": "0.41.0",
+    "hono": "^4.5.0",
+    "pg": "^8.16.3",
+    "ponder": "^0.16.6",
+    "viem": "^2.21.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8"
+  },
+  "engines": {
+    "node": ">=18.14"
+  }
+}

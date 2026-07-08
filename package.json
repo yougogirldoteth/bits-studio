@@ -1,0 +1,21 @@
+{
+  "name": "bits-collection-framework",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "build:app": "pnpm --dir packages/app build",
+    "codegen:indexer": "pnpm --dir packages/indexer codegen",
+    "dev:app": "pnpm --dir packages/app dev",
+    "dev:indexer": "pnpm --dir packages/indexer dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "packageManager": "pnpm@10.30.0",
+  "devDependencies": {
+    "prettier": "^3.8.1"
+  }
+}

@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.output/
+.nuxt/
+.nitro/
+.vercel/
+.cache/
+coverage/
+playwright-report/
+test-results/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Ponder
+.ponder/
+generated/
+
+# OS/editor
+.DS_Store
+*.log
+
+# Legacy artist handoff. Keep local, do not ship.
+bits-collection-mint sync fix.html

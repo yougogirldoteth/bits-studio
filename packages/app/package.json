@@ -1,0 +1,28 @@
+{
+  "name": "@bits-collection/app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck",
+    "test:visual": "playwright test",
+    "kamal:setup": "set -a && . ./.env.production && set +a && kamal setup",
+    "kamal:deploy": "set -a && . ./.env.production && set +a && kamal deploy",
+    "kamal:sh": "set -a && . ./.env.production && set +a && kamal app exec -i --reuse sh"
+  },
+  "dependencies": {
+    "@1001-digital/components": "2.8.9",
+    "@1001-digital/components.evm": "3.6.13",
+    "@1001-digital/layers.evm": "^2.7.29",
+    "@bits-collection/shared": "workspace:*",
+    "nuxt": "^4.4.6",
+    "reka-ui": "2.9.9",
+    "viem": "2.48.4",
+    "vue": "3.5.35"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "types": ["node"]
+  },
+  "include": [
+    "abis/**/*.ts",
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "utils/**/*.ts",
+    "ponder.config.ts",
+    "ponder.schema.ts",
+    "ponder-env.d.ts"
+  ]
+}
