@@ -9,6 +9,7 @@
   --bits-accent: #111111;
   --bits-error: #b42318;
   --bits-success: #16703a;
+  --bits-control-height: 2.7rem;
 
   --background: var(--bits-bg);
   --color: var(--bits-ink);
@@ -68,11 +69,12 @@ button {
   font: inherit;
 }
 
-button.bits-button,
-button.bits-icon-button,
-button.bits-segment {
+.bits-button,
+.bits-connect,
+.bits-icon-button,
+.bits-segment {
   display: inline-flex;
-  block-size: auto;
+  block-size: var(--bits-control-height);
   min-inline-size: auto;
   align-items: center;
   justify-content: center;
@@ -83,42 +85,45 @@ button.bits-segment {
   background: var(--bits-bg);
   color: var(--bits-ink);
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
   line-height: 1;
-  padding: 0.72rem 0.85rem;
+  padding: 0 0.9rem;
+  text-decoration: none;
   transition:
     background-color 120ms ease,
     color 120ms ease,
     opacity 120ms ease;
 }
 
-button.bits-button:hover:not(:disabled),
-button.bits-icon-button:hover:not(:disabled),
-button.bits-segment:hover:not(:disabled),
-button.bits-segment[aria-pressed='true'] {
+.bits-button:hover:not(:disabled),
+.bits-connect:hover:not(:disabled),
+.bits-icon-button:hover:not(:disabled),
+.bits-segment:hover:not(:disabled),
+.bits-segment[aria-pressed='true'] {
   background: var(--bits-ink);
   color: var(--bits-bg);
 }
 
-button.bits-button:disabled,
-button.bits-icon-button:disabled,
-button.bits-segment:disabled {
+.bits-button:disabled,
+.bits-connect:disabled,
+.bits-icon-button:disabled,
+.bits-segment:disabled {
   cursor: not-allowed;
   opacity: 0.42;
 }
 
-button.bits-button--primary {
+.bits-button--primary {
   background: var(--bits-ink);
   color: var(--bits-bg);
 }
 
-button.bits-button--primary:hover:not(:disabled) {
+.bits-button--primary:hover:not(:disabled) {
   background: var(--bits-bg);
   color: var(--bits-ink);
 }
 
-button.bits-icon-button {
+.bits-icon-button {
   inline-size: 2.55rem;
   padding-inline: 0;
 }
@@ -159,80 +164,120 @@ dialog {
 .bits-shell {
   inline-size: min(100%, 118rem);
   margin-inline: auto;
-  padding: clamp(1rem, 2vw, 2rem);
+  padding: clamp(1rem, 2vw, 2.25rem);
 }
 
 .bits-topbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1rem;
+  gap: clamp(1rem, 2vw, 2rem);
   align-items: start;
   border-block-end: 1px solid var(--bits-rule);
-  min-block-size: 4.5rem;
+  padding-block-end: clamp(1rem, 2vw, 1.5rem);
 }
 
 .bits-brand {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .bits-brand__name {
   margin: 0;
-  font-size: clamp(1.8rem, 5vw, 5.8rem);
+  font-size: clamp(2rem, 5vw, 5.8rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 0.95;
+  line-height: 0.98;
 }
 
 .bits-brand__meta,
 .bits-meta {
   color: var(--bits-muted);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
+  font-weight: 500;
   line-height: 1.45;
 }
 
 .bits-wallet {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
 }
 
 .bits-section {
-  padding-block: clamp(1rem, 2vw, 2rem);
+  padding-block: clamp(1rem, 1.8vw, 1.75rem);
 }
 
-.bits-control-band {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1rem;
-  align-items: end;
+.bits-hero {
   border-block-end: 1px solid var(--bits-rule);
-  padding-block-end: 1rem;
+  padding-block-end: clamp(1rem, 1.8vw, 1.5rem);
+}
+
+.bits-mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  border-block-end: 1px solid var(--bits-rule);
+  padding-block-end: clamp(1rem, 1.8vw, 1.5rem);
+}
+
+.bits-button--mint-set {
+  min-inline-size: 8.85rem;
+}
+
+.bits-button--mint-set:disabled {
+  background: var(--bits-ink);
+  color: var(--bits-bg);
+  opacity: 0.62;
 }
 
 .bits-copy {
   max-inline-size: 48rem;
   display: grid;
-  gap: 0.7rem;
+  gap: 0.65rem;
 }
 
 .bits-copy p {
   margin: 0;
-  font-size: clamp(1rem, 1.6vw, 1.45rem);
-  line-height: 1.28;
+  font-size: clamp(1rem, 1.35vw, 1.25rem);
+  line-height: 1.36;
+}
+
+.bits-launch-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+}
+
+.bits-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--bits-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.bits-inline-link svg {
+  inline-size: 0.82rem;
+  block-size: 0.82rem;
 }
 
 .bits-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(8rem, 1fr));
-  border-block: 1px solid var(--bits-rule);
+  border: 1px solid var(--bits-rule);
 }
 
 .bits-stat {
-  min-block-size: 5rem;
-  padding: 0.9rem;
+  min-block-size: 4.7rem;
+  padding: 0.95rem;
   border-inline-end: 1px solid var(--bits-rule);
 }
 
@@ -242,14 +287,15 @@ dialog {
 
 .bits-stat__label {
   color: var(--bits-muted);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
+  font-weight: 500;
 }
 
 .bits-stat__value {
   margin-block-start: 0.45rem;
-  font-size: clamp(1.1rem, 2vw, 2rem);
-  line-height: 1;
+  font-size: clamp(1rem, 1.45vw, 1.4rem);
+  font-weight: 500;
+  line-height: 1.1;
 }
 
 .bits-toolbar {
@@ -261,7 +307,8 @@ dialog {
 
 .bits-segments {
   display: inline-grid;
-  grid-template-columns: repeat(2, minmax(6.5rem, 1fr));
+  grid-template-columns: repeat(2, minmax(5.85rem, 1fr));
+  margin-inline-start: auto;
 }
 
 .bits-segment + .bits-segment {
@@ -366,12 +413,6 @@ dialog {
 }
 
 @media (max-width: 760px) {
-  .bits-topbar,
-  .bits-control-band {
-    grid-template-columns: 1fr;
-  }
-
-  .bits-wallet,
   .bits-toolbar {
     justify-content: flex-start;
   }
@@ -396,6 +437,20 @@ dialog {
 @media (max-width: 520px) {
   .bits-shell {
     padding: 0.75rem;
+  }
+
+  .bits-mode-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bits-button--mint-set,
+  .bits-segments {
+    inline-size: 100%;
+  }
+
+  .bits-segments {
+    margin-inline-start: 0;
   }
 
   .bits-grid,

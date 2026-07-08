@@ -13,34 +13,25 @@
           <NuxtLink v-if="collections.length > 1" class="bits-button" to="/">
             Collections
           </NuxtLink>
-          <ConnectButton />
+          <ConnectButton ref="connectButton" />
         </div>
       </header>
 
-      <section class="bits-section bits-control-band">
+      <section class="bits-section bits-hero">
         <div class="bits-copy">
           <p>{{ collection.description }}</p>
-          <div class="bits-meta">{{ collection.launchLabel }}</div>
-        </div>
-        <div class="bits-toolbar">
-          <button
-            class="bits-button bits-button--primary"
-            type="button"
-            :disabled="!address || collectionSoldOut"
-            @click="emit('mintCollection')"
-          >
-            <Icon name="lucide:layers" />
-            <span>Mint full set</span>
-          </button>
-          <a
-            class="bits-button"
-            :href="collection.explorerUrl"
-            rel="noreferrer"
-            target="_blank"
-          >
-            <Icon name="lucide:external-link" />
-            <span>Contract</span>
-          </a>
+          <div class="bits-meta bits-launch-line">
+            <span>{{ collection.launchLabel }}</span>
+            <a
+              class="bits-inline-link"
+              :href="collection.explorerUrl"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <span>View contract</span>
+              <Icon name="lucide:external-link" />
+            </a>
+          </div>
         </div>
       </section>
 
@@ -67,7 +58,16 @@
         </div>
       </section>
 
-      <section class="bits-section bits-control-band">
+      <section class="bits-section bits-mode-row">
+        <button
+          class="bits-button bits-button--primary bits-button--mint-set"
+          type="button"
+          :disabled="collectionSoldOut"
+          @click="mintCollection"
+        >
+          <Icon name="lucide:layers" />
+          <span>Mint full set</span>
+        </button>
         <div class="bits-segments">
           <button
             class="bits-segment"
@@ -86,16 +86,6 @@
             Live HTML
           </button>
         </div>
-        <div class="bits-toolbar">
-          <button
-            class="bits-icon-button"
-            type="button"
-            title="Refresh"
-            @click="emit('refresh')"
-          >
-            <Icon name="lucide:refresh-cw" />
-          </button>
-        </div>
       </section>
 
       <section class="bits-section">
@@ -103,11 +93,11 @@
           <CollectionTokenCard
             v-for="token in tokens"
             :key="token.tokenId"
-            :disabled="!address || token.soldOut"
+            :disabled="token.soldOut"
             :mode="mode"
             :price-label="collection.priceLabel"
             :token="token"
-            @mint="emit('mintToken', $event)"
+            @mint="mintToken"
           />
         </div>
         <div v-else class="bits-empty">Indexing collection.</div>
@@ -130,13 +120,30 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  refresh: []
   mintCollection: []
   mintToken: [token: BitsTokenSummary]
 }>()
 
 const mode = ref<'thumbnail' | 'html'>('thumbnail')
+const connectButton = ref<{ open: () => void } | null>(null)
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
 )
+
+function ensureConnected() {
+  if (props.address) return true
+
+  connectButton.value?.open()
+  return false
+}
+
+function mintCollection() {
+  if (!ensureConnected()) return
+  emit('mintCollection')
+}
+
+function mintToken(token: BitsTokenSummary) {
+  if (!ensureConnected()) return
+  emit('mintToken', token)
+}
 </script>

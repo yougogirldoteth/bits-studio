@@ -7,7 +7,6 @@
     :tokens="data.tokens"
     @mint-collection="startCollectionMint"
     @mint-token="startTokenMint"
-    @refresh="refresh"
   />
   <main v-else-if="error" class="bits-page">
     <div class="bits-shell bits-error">
