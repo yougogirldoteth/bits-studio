@@ -7,3 +7,5 @@ coverage
 playwright-report
 test-results
 bits-collection-mint sync fix.html
+packages/app/config/deploy.yml
+packages/indexer/config/deploy.yml

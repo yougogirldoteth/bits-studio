@@ -28,7 +28,8 @@ export function useBitsContracts() {
         functionName: 'mintCollectionPublic',
         args: [BigInt(collection.collectionId), recipient],
         chainId: collection.chainId,
-        value: BigInt(collection.pricePerTokenWei) * BigInt(collection.tokenCount),
+        value:
+          BigInt(collection.pricePerTokenWei) * BigInt(collection.tokenCount),
       }) as Promise<Hash>
     }
   }

@@ -29,11 +29,15 @@ export function validateBitsCollection(collection: BitsCollectionConfig) {
   }
 
   if (collection.chain !== 'mainnet' || collection.chainId !== 1) {
-    throw new Error(`Collection ${collection.slug} must target Ethereum mainnet`)
+    throw new Error(
+      `Collection ${collection.slug} must target Ethereum mainnet`,
+    )
   }
 
   if (!isAddress(collection.bitsContract)) {
-    throw new Error(`Collection ${collection.slug} has an invalid bits contract`)
+    throw new Error(
+      `Collection ${collection.slug} has an invalid bits contract`,
+    )
   }
 
   if (!isAddress(collection.rendererContract)) {
@@ -43,7 +47,9 @@ export function validateBitsCollection(collection: BitsCollectionConfig) {
   }
 
   if (collection.collectionId <= 0n) {
-    throw new Error(`Collection ${collection.slug} has an invalid collection id`)
+    throw new Error(
+      `Collection ${collection.slug} has an invalid collection id`,
+    )
   }
 
   if (collection.startTokenId <= 0 || collection.tokenCount <= 0) {

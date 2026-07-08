@@ -170,20 +170,22 @@ async function refreshToken(
     })
     .onConflictDoNothing()
 
-  await context.db.update(bitsToken, { id: tokenRowId(collection, tokenId) }).set({
-    minted,
-    edition_size: collection.editionSize,
-    available,
-    name: metadata.name,
-    audio_filename: metadata.audioFilename,
-    svg_filename: metadata.svgFilename,
-    source: metadata.source,
-    processed: metadata.processed,
-    svg: metadata.svg,
-    html: metadata.html,
-    renderer_updated_at: timestamp,
-    updated_at: timestamp,
-  })
+  await context.db
+    .update(bitsToken, { id: tokenRowId(collection, tokenId) })
+    .set({
+      minted,
+      edition_size: collection.editionSize,
+      available,
+      name: metadata.name,
+      audio_filename: metadata.audioFilename,
+      svg_filename: metadata.svgFilename,
+      source: metadata.source,
+      processed: metadata.processed,
+      svg: metadata.svg,
+      html: metadata.html,
+      renderer_updated_at: timestamp,
+      updated_at: timestamp,
+    })
 }
 
 async function refreshBalance(
@@ -275,14 +277,19 @@ for (const collection of INDEXED_COLLECTIONS) {
 
   ponder.on(
     `${contractName}:TransferSingle` as never,
-    async ({ event, context }: { event: PonderEvent; context: PonderContext }) => {
+    async ({
+      event,
+      context,
+    }: {
+      event: PonderEvent
+      context: PonderContext
+    }) => {
       const tokenId = Number(event.args.id)
       const from = event.args.from as Address
       const to = event.args.to as Address
       const operator = event.args.operator as Address
       const value = event.args.value as bigint
-      const type =
-        from.toLowerCase() === ZERO_ADDRESS ? 'mint' : 'transfer'
+      const type = from.toLowerCase() === ZERO_ADDRESS ? 'mint' : 'transfer'
 
       await recordActivity(context, collection, event, {
         type,
@@ -305,14 +312,19 @@ for (const collection of INDEXED_COLLECTIONS) {
 
   ponder.on(
     `${contractName}:TransferBatch` as never,
-    async ({ event, context }: { event: PonderEvent; context: PonderContext }) => {
+    async ({
+      event,
+      context,
+    }: {
+      event: PonderEvent
+      context: PonderContext
+    }) => {
       const from = event.args.from as Address
       const to = event.args.to as Address
       const operator = event.args.operator as Address
       const ids = event.args.ids as readonly bigint[]
       const values = event.args.values as readonly bigint[]
-      const type =
-        from.toLowerCase() === ZERO_ADDRESS ? 'mint' : 'transfer'
+      const type = from.toLowerCase() === ZERO_ADDRESS ? 'mint' : 'transfer'
 
       await Promise.all(
         ids.map(async (id, index) => {
@@ -341,7 +353,13 @@ for (const collection of INDEXED_COLLECTIONS) {
 
   ponder.on(
     `${contractName}:MetadataUpdate` as never,
-    async ({ event, context }: { event: PonderEvent; context: PonderContext }) => {
+    async ({
+      event,
+      context,
+    }: {
+      event: PonderEvent
+      context: PonderContext
+    }) => {
       const tokenId = Number(event.args._tokenId)
       await recordActivity(context, collection, event, {
         type: 'metadata',
@@ -353,7 +371,13 @@ for (const collection of INDEXED_COLLECTIONS) {
 
   ponder.on(
     `${contractName}:BatchMetadataUpdate` as never,
-    async ({ event, context }: { event: PonderEvent; context: PonderContext }) => {
+    async ({
+      event,
+      context,
+    }: {
+      event: PonderEvent
+      context: PonderContext
+    }) => {
       const fromTokenId = Number(event.args._fromTokenId)
       const toTokenId = Number(event.args._toTokenId)
       const configuredIds = new Set(tokenIdsForCollection(collection))
@@ -375,7 +399,13 @@ for (const collection of INDEXED_COLLECTIONS) {
 
   ponder.on(
     `${contractName}:OwnershipTransferred` as never,
-    async ({ event, context }: { event: PonderEvent; context: PonderContext }) => {
+    async ({
+      event,
+      context,
+    }: {
+      event: PonderEvent
+      context: PonderContext
+    }) => {
       await recordActivity(context, collection, event, {
         type: 'ownership',
         from: event.args.previousOwner as Address,

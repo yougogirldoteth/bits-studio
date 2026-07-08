@@ -1,8 +1,5 @@
 <template>
-  <article
-    class="bits-token"
-    :data-sold-out="token.soldOut"
-  >
+  <article class="bits-token" :data-sold-out="token.soldOut">
     <div class="bits-token__media">
       <iframe
         v-if="mode === 'html' && token.html"
@@ -15,12 +12,7 @@
         :alt="`${token.name || `Token ${token.tokenId}`} thumbnail`"
         :src="imageSrc"
       />
-      <div
-        v-else
-        class="bits-token__fallback"
-      >
-        Token {{ token.tokenId }}
-      </div>
+      <div v-else class="bits-token__fallback">Token {{ token.tokenId }}</div>
     </div>
 
     <div class="bits-token__body">

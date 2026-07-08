@@ -13,6 +13,12 @@ export default defineNuxtConfig({
     port: Number(process.env.NUXT_DEV_PORT ?? 3010),
   },
 
+  vite: {
+    optimizeDeps: {
+      include: ['viem'],
+    },
+  },
+
   app: {
     head: {
       title: 'BITS Collections',
@@ -37,8 +43,7 @@ export default defineNuxtConfig({
       bits: {
         indexerUrl:
           process.env.NUXT_PUBLIC_BITS_INDEXER_URL ?? 'http://localhost:42069',
-        indexerChain:
-          process.env.NUXT_PUBLIC_BITS_INDEXER_CHAIN ?? 'mainnet',
+        indexerChain: process.env.NUXT_PUBLIC_BITS_INDEXER_CHAIN ?? 'mainnet',
       },
       evm: {
         walletConnectProjectId:

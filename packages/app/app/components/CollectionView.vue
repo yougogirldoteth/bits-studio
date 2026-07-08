@@ -10,14 +10,10 @@
           <h1 class="bits-brand__name">{{ collection.title }}</h1>
         </div>
         <div class="bits-wallet">
-          <NuxtLink
-            v-if="collections.length > 1"
-            class="bits-button"
-            to="/"
-          >
+          <NuxtLink v-if="collections.length > 1" class="bits-button" to="/">
             Collections
           </NuxtLink>
-          <BitsConnect />
+          <ConnectButton />
         </div>
       </header>
 
@@ -103,11 +99,8 @@
       </section>
 
       <section class="bits-section">
-        <div
-          v-if="tokens.length"
-          class="bits-grid"
-        >
-          <BitsTokenCard
+        <div v-if="tokens.length" class="bits-grid">
+          <CollectionTokenCard
             v-for="token in tokens"
             :key="token.tokenId"
             :disabled="!address || token.soldOut"
@@ -117,12 +110,7 @@
             @mint="emit('mintToken', $event)"
           />
         </div>
-        <div
-          v-else
-          class="bits-empty"
-        >
-          Indexing collection.
-        </div>
+        <div v-else class="bits-empty">Indexing collection.</div>
       </section>
     </div>
   </main>

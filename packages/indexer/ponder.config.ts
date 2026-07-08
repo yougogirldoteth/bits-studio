@@ -1,6 +1,6 @@
 import { loadBalance } from '@ponder/utils'
 import { createConfig } from 'ponder'
-import { fallback, http, webSocket } from 'viem'
+import { fallback, http } from 'viem'
 import { bitsAbi } from '@bits-collection/shared'
 import {
   INDEXED_COLLECTIONS,
@@ -47,7 +47,7 @@ export default createConfig({
     mainnet: {
       id: chainId,
       rpc: rpcTransport,
-      ws: wsUrl ? webSocket(wsUrl) : undefined,
+      ws: wsUrl,
     },
   },
   contracts,

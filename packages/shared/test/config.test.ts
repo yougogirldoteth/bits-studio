@@ -19,10 +19,10 @@ test('primary collection exposes the configured token range', () => {
   const collection = getPrimaryBitsCollection()
 
   assert.equal(collection.slug, 'drums-collection-1')
-  assert.deepEqual(tokenIdsForCollection(collection), [
-    1, 2, 3, 4, 5, 6, 7, 8,
-    9, 10, 11, 12, 13, 14, 15, 16,
-  ])
+  assert.deepEqual(
+    tokenIdsForCollection(collection),
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  )
 })
 
 test('supply and price helpers use bigint math', () => {

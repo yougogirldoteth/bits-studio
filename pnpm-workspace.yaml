@@ -1,2 +1,10 @@
 packages:
   - packages/*
+allowBuilds:
+  '@parcel/watcher': true
+  '@reown/appkit': true
+  esbuild: true
+  keccak: true
+  protobufjs: true
+  secp256k1: true
+  vue-demi: true

@@ -1,4 +1,4 @@
-export function decodeDataUri(value: string) {
+export function decodeDataUri(value: string): string {
   const uri = value.trim()
   const comma = uri.indexOf(',')
   if (!uri.startsWith('data:') || comma < 0) return ''
@@ -13,7 +13,7 @@ export function decodeDataUri(value: string) {
   return decodeURIComponent(body)
 }
 
-export function imageSrcFromSvg(value: string) {
+export function imageSrcFromSvg(value: string): string {
   let svg = value.trim()
   if (!svg) return ''
 
@@ -56,7 +56,7 @@ export function imageSrcFromSvg(value: string) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 }
 
-export function htmlSrcdoc(value: string) {
+export function htmlSrcdoc(value: string): string {
   let html = value.trim()
   if (!html) return ''
 
@@ -74,7 +74,7 @@ export function htmlSrcdoc(value: string) {
   return html
 }
 
-function decodeBase64Utf8(value: string) {
+function decodeBase64Utf8(value: string): string {
   try {
     if (typeof globalThis.atob === 'function') {
       const binary = globalThis.atob(value)

@@ -1,5 +1,5 @@
 <template>
-  <BitsCollectionView
+  <CollectionView
     v-if="data"
     :address="address"
     :collection="data.collection"
@@ -9,22 +9,16 @@
     @mint-token="startTokenMint"
     @refresh="refresh"
   />
-  <main
-    v-else-if="error"
-    class="bits-page"
-  >
+  <main v-else-if="error" class="bits-page">
     <div class="bits-shell bits-error">
       {{ error.statusMessage || error.message }}
     </div>
   </main>
-  <main
-    v-else
-    class="bits-page"
-  >
+  <main v-else class="bits-page">
     <div class="bits-shell bits-empty">Loading collection.</div>
   </main>
 
-  <BitsTransactionFlow
+  <TransactionFlow
     ref="transactionFlow"
     chain="mainnet"
     :request="pendingRequest"

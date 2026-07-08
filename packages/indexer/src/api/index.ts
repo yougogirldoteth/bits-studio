@@ -3,11 +3,7 @@ import type { Context } from 'hono'
 import { client, graphql } from 'ponder'
 import { asc, count, desc, eq } from 'ponder'
 import { db } from 'ponder:api'
-import schema, {
-  bitsActivity,
-  bitsCollection,
-  bitsToken,
-} from 'ponder:schema'
+import schema, { bitsActivity, bitsCollection, bitsToken } from 'ponder:schema'
 import {
   bitsCollections,
   createCollectionSummary,
@@ -87,7 +83,10 @@ function activityItem(row: ActivityRow): BitsActivityItem {
 }
 
 async function findCollectionRow(slug: string) {
-  return db.select().from(bitsCollection).where(eq(bitsCollection.slug, slug))
+  return db
+    .select()
+    .from(bitsCollection)
+    .where(eq(bitsCollection.slug, slug))
     .then((rows) => rows[0] ?? null)
 }
 
@@ -98,11 +97,6 @@ async function listTokenRows(slug: string) {
     .where(eq(bitsToken.collection_slug, slug))
     .orderBy(asc(bitsToken.token_id))
 }
-
-app.get('/ready', (c) => {
-  noStore(c)
-  return c.json({ ok: true })
-})
 
 app.get('/collections', async (c) => {
   noStore(c)
