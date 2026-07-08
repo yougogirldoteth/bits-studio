@@ -1,8 +1,11 @@
 <template>
   <button class="bits-connect" type="button" @click="open">
-    <span>{{
-      connectedAddress ? shortAddress(connectedAddress) : 'Connect'
-    }}</span>
+    <EvmAccount v-if="connectedAddress" :address="connectedAddress" resolve-ens>
+      <template #default="{ display }">
+        <span>{{ display }}</span>
+      </template>
+    </EvmAccount>
+    <span v-else>Connect</span>
   </button>
 
   <Dialog
