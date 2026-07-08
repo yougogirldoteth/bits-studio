@@ -1,6 +1,6 @@
 <%
 service_name = ENV["KAMAL_SERVICE"].to_s.strip
-service_name = "bits-collection-indexer" if service_name.empty?
+service_name = "dav-worldcomputer-art-indexer" if service_name.empty?
 
 image_name = ENV["KAMAL_IMAGE"].to_s.strip
 image_name = service_name if image_name.empty?
@@ -9,7 +9,16 @@ db_service_name = ENV["POSTGRES_SERVICE"].to_s.strip
 db_service_name = "#{service_name}-db" if db_service_name.empty?
 
 postgres_data = ENV["POSTGRES_DATA"].to_s.strip
-postgres_data = "#{db_service_name}-data" if postgres_data.empty?
+postgres_data = "/home/deploy/dav-worldcomputer-art-indexer-db/data" if postgres_data.empty?
+
+project_slug = ENV["VVORK_PROJECT"].to_s.strip
+project_slug = "dav-worldcomputer-art" if project_slug.empty?
+
+project_url = ENV["VVORK_URL"].to_s.strip
+project_url = "https://indexer.dav.worldcomputer.art" if project_url.empty?
+
+project_repo = ENV["VVORK_REPO"].to_s.strip
+project_repo = "https://github.com/yougogirldoteth/bits-studio" if project_repo.empty?
 
 indexer_hosts = [ENV["INDEXER_HOST"].to_s]
   .concat((ENV["INDEXER_ADDITIONAL_HOSTS"] || "").split(","))
@@ -26,6 +35,15 @@ servers:
   web:
     hosts:
       - <%= ENV["DEPLOY_HOST"] %>
+    options:
+      network: shared
+
+labels:
+  vvork.project: '<%= project_slug %>'
+  vvork.kind: worker
+  vvork.owner: personal
+  vvork.url: '<%= project_url %>'
+  vvork.repo: '<%= project_repo %>'
 
 proxy:
   ssl: true
@@ -69,6 +87,14 @@ accessories:
     service: <%= db_service_name %>
     image: postgres:17-alpine
     host: <%= ENV["DEPLOY_HOST"] %>
+    options:
+      network: shared
+    labels:
+      vvork.project: '<%= project_slug %>'
+      vvork.kind: db
+      vvork.owner: personal
+      vvork.url: '<%= project_url %>'
+      vvork.repo: '<%= project_repo %>'
     env:
       clear:
         POSTGRES_DB: ponder

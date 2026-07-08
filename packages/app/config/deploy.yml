@@ -1,9 +1,18 @@
 <%
 service_name = ENV["KAMAL_SERVICE"].to_s.strip
-service_name = "bits-collection-app" if service_name.empty?
+service_name = "dav-worldcomputer-art" if service_name.empty?
 
 image_name = ENV["KAMAL_IMAGE"].to_s.strip
 image_name = service_name if image_name.empty?
+
+project_slug = ENV["VVORK_PROJECT"].to_s.strip
+project_slug = "dav-worldcomputer-art" if project_slug.empty?
+
+project_url = ENV["VVORK_URL"].to_s.strip
+project_url = "https://dav.worldcomputer.art" if project_url.empty?
+
+project_repo = ENV["VVORK_REPO"].to_s.strip
+project_repo = "https://github.com/yougogirldoteth/bits-studio" if project_repo.empty?
 
 app_hosts = [ENV["APP_HOST"].to_s]
   .concat((ENV["APP_ADDITIONAL_HOSTS"] || "").split(","))
@@ -31,6 +40,15 @@ servers:
   web:
     hosts:
       - <%= ENV["DEPLOY_HOST"] %>
+    options:
+      network: shared
+
+labels:
+  vvork.project: '<%= project_slug %>'
+  vvork.kind: app
+  vvork.owner: personal
+  vvork.url: '<%= project_url %>'
+  vvork.repo: '<%= project_repo %>'
 
 proxy:
   ssl: true
