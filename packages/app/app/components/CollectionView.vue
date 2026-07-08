@@ -13,7 +13,11 @@
           <NuxtLink v-if="collections.length > 1" class="bits-button" to="/">
             Collections
           </NuxtLink>
-          <ConnectButton ref="connectButton" />
+          <ConnectButton
+            ref="connectButton"
+            @closed="clearPendingMintIntent"
+            @connected="flushPendingMintIntent"
+          />
         </div>
       </header>
 
@@ -124,26 +128,67 @@ const emit = defineEmits<{
   mintToken: [token: BitsTokenSummary]
 }>()
 
+type PendingMintIntent =
+  { type: 'collection' } | { type: 'token'; token: BitsTokenSummary }
+
 const mode = ref<'thumbnail' | 'html'>('thumbnail')
 const connectButton = ref<{ open: () => void } | null>(null)
+const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
 )
 
-function ensureConnected() {
-  if (props.address) return true
+watch(
+  () => props.address,
+  (address) => {
+    if (address) {
+      void flushPendingMintIntent()
+    }
+  },
+)
 
+function emitMintIntent(intent: PendingMintIntent) {
+  if (intent.type === 'collection') {
+    emit('mintCollection')
+    return
+  }
+
+  emit('mintToken', intent.token)
+}
+
+function requestMint(intent: PendingMintIntent) {
+  if (props.address) {
+    emitMintIntent(intent)
+    return
+  }
+
+  pendingMintIntent.value = intent
   connectButton.value?.open()
-  return false
 }
 
 function mintCollection() {
-  if (!ensureConnected()) return
-  emit('mintCollection')
+  if (collectionSoldOut.value) return
+  requestMint({ type: 'collection' })
 }
 
 function mintToken(token: BitsTokenSummary) {
-  if (!ensureConnected()) return
-  emit('mintToken', token)
+  if (token.soldOut) return
+  requestMint({ type: 'token', token })
+}
+
+async function flushPendingMintIntent() {
+  if (!pendingMintIntent.value) return
+
+  await nextTick()
+
+  if (!props.address || !pendingMintIntent.value) return
+
+  const intent = pendingMintIntent.value
+  pendingMintIntent.value = null
+  emitMintIntent(intent)
+}
+
+function clearPendingMintIntent() {
+  pendingMintIntent.value = null
 }
 </script>
