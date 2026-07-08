@@ -1,0 +1,84 @@
+<%
+service_name = ENV["KAMAL_SERVICE"].to_s.strip
+service_name = "bits-collection-indexer" if service_name.empty?
+
+image_name = ENV["KAMAL_IMAGE"].to_s.strip
+image_name = service_name if image_name.empty?
+
+db_service_name = ENV["POSTGRES_SERVICE"].to_s.strip
+db_service_name = "#{service_name}-db" if db_service_name.empty?
+
+postgres_data = ENV["POSTGRES_DATA"].to_s.strip
+postgres_data = "#{db_service_name}-data" if postgres_data.empty?
+
+indexer_hosts = [ENV["INDEXER_HOST"].to_s]
+  .concat((ENV["INDEXER_ADDITIONAL_HOSTS"] || "").split(","))
+  .map(&:strip)
+  .reject(&:empty?)
+  .uniq
+%>
+
+service: <%= service_name %>
+
+image: <%= ENV["DOCKER_REGISTRY_USERNAME"] %>/<%= image_name %>
+
+servers:
+  web:
+    hosts:
+      - <%= ENV["DEPLOY_HOST"] %>
+
+proxy:
+  ssl: true
+  hosts:
+<% indexer_hosts.each do |host| %>
+    - <%= host %>
+<% end %>
+  app_port: 42069
+  healthcheck:
+    path: /ready
+    interval: 5
+    timeout: 3600
+
+deploy_timeout: 3600
+
+registry:
+  username: <%= ENV["DOCKER_REGISTRY_USERNAME"] %>
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  context: ../..
+  dockerfile: ../../Dockerfile.indexer
+
+env:
+  clear:
+    PONDER_TELEMETRY_DISABLED: 'true'
+    PONDER_RPC_REQUESTS_PER_SECOND_1: '<%= ENV["PONDER_RPC_REQUESTS_PER_SECOND_1"] || "5" %>'
+    PONDER_ETH_GET_LOGS_BLOCK_RANGE_1: '<%= ENV["PONDER_ETH_GET_LOGS_BLOCK_RANGE_1"] || "5000" %>'
+    PONDER_VIEWS_SCHEMA: <%= ENV["PONDER_VIEWS_SCHEMA"] || "bits_indexer" %>
+  secret:
+    - PONDER_RPC_URLS_1
+    - PONDER_RPC_FALLBACK_URLS_1
+    - PONDER_WS_URL_1
+    - DATABASE_URL
+    - DATABASE_SCHEMA
+
+accessories:
+  db:
+    service: <%= db_service_name %>
+    image: postgres:17-alpine
+    host: <%= ENV["DEPLOY_HOST"] %>
+    env:
+      clear:
+        POSTGRES_DB: ponder
+        POSTGRES_USER: ponder
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - <%= postgres_data %>:/var/lib/postgresql/data
+
+<% if ENV["DEPLOY_USER"].to_s.strip != "" %>
+ssh:
+  user: <%= ENV["DEPLOY_USER"] %>
+<% end %>

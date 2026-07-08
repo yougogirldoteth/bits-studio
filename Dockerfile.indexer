@@ -1,0 +1,27 @@
+FROM node:24-alpine AS base
+RUN npm install -g corepack && corepack enable && corepack prepare pnpm@10.30.0 --activate
+WORKDIR /app
+
+FROM base AS deps
+COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/indexer/package.json packages/indexer/package.json
+RUN pnpm install --frozen-lockfile --filter @bits-collection/indexer...
+
+FROM deps AS build
+COPY packages/shared packages/shared
+COPY packages/indexer packages/indexer
+WORKDIR /app/packages/indexer
+ENV PONDER_RPC_URLS_1=https://eth.drpc.org
+RUN pnpm codegen
+
+FROM base AS production
+WORKDIR /app
+COPY --from=build /app /app
+WORKDIR /app/packages/indexer
+
+ENV HOST=0.0.0.0
+ENV PORT=42069
+EXPOSE 42069
+
+CMD ["sh", "-c", "set -u; schema=${DATABASE_SCHEMA:-bits_indexer_$(printf %s \"${KAMAL_VERSION:-local}\" | sha1sum | cut -c1-16)}; views_schema=${PONDER_VIEWS_SCHEMA:-bits_indexer}; exec pnpm start --schema=\"$schema\" --views-schema=\"$views_schema\""]

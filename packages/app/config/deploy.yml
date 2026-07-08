@@ -1,0 +1,68 @@
+<%
+service_name = ENV["KAMAL_SERVICE"].to_s.strip
+service_name = "bits-collection-app" if service_name.empty?
+
+image_name = ENV["KAMAL_IMAGE"].to_s.strip
+image_name = service_name if image_name.empty?
+
+app_hosts = [ENV["APP_HOST"].to_s]
+  .concat((ENV["APP_ADDITIONAL_HOSTS"] || "").split(","))
+  .map(&:strip)
+  .reject(&:empty?)
+  .uniq
+
+def rpc_list(configured, fallback)
+  urls = configured.to_s.split(/\s+/)
+  urls = [fallback] if urls.empty?
+
+  urls
+    .map(&:strip)
+    .reject(&:empty?)
+    .uniq
+    .join(" ")
+end
+%>
+
+service: <%= service_name %>
+
+image: <%= ENV["DOCKER_REGISTRY_USERNAME"] %>/<%= image_name %>
+
+servers:
+  web:
+    hosts:
+      - <%= ENV["DEPLOY_HOST"] %>
+
+proxy:
+  ssl: true
+  hosts:
+<% app_hosts.each do |host| %>
+    - <%= host %>
+<% end %>
+  app_port: 3000
+  healthcheck:
+    path: /
+    interval: 5
+    timeout: 60
+
+registry:
+  username: <%= ENV["DOCKER_REGISTRY_USERNAME"] %>
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  context: ../..
+  dockerfile: ../../Dockerfile.app
+
+env:
+  clear:
+    NITRO_CLUSTER_WORKERS: '<%= ENV["NITRO_CLUSTER_WORKERS"] || "2" %>'
+    NUXT_PUBLIC_BITS_INDEXER_URL: '<%= ENV["NUXT_PUBLIC_BITS_INDEXER_URL"] || "https://indexer.example.com" %>'
+    NUXT_PUBLIC_BITS_INDEXER_CHAIN: '<%= ENV["NUXT_PUBLIC_BITS_INDEXER_CHAIN"] || "mainnet" %>'
+    NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID: '<%= ENV["NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID"] || "" %>'
+    NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS: '<%= rpc_list(ENV["NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS"], "https://eth.drpc.org") %>'
+
+<% if ENV["DEPLOY_USER"].to_s.strip != "" %>
+ssh:
+  user: <%= ENV["DEPLOY_USER"] %>
+<% end %>
