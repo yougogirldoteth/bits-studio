@@ -39,6 +39,7 @@ The app defaults to `http://localhost:3010`; the indexer defaults to
 
 Drums Collection 1 is configured in `packages/shared/src/collections.ts`:
 
+- Contracts created by [DAV](https://x.com/producedbydav).
 - BITS contract: `0xb49911f9063154318dd98848c65c1cb15e43c917`
 - Renderer contract: `0x841eb707c98bf64572c88bc3b8001568e1437e00`
 - Ethereum mainnet
