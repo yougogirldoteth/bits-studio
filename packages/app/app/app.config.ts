@@ -1,6 +1,6 @@
 export default defineAppConfig({
   evm: {
-    title: 'BITS Collections',
+    title: 'bits',
     defaultChain: 'mainnet',
     ens: {
       mode: 'chain',

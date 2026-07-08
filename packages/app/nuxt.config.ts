@@ -20,13 +20,13 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'BITS Collections',
+      title: 'bits',
       meta: [
         {
           name: 'description',
           content: 'Reusable mint and gallery frontend for BITS collections.',
         },
-        { property: 'og:title', content: 'BITS Collections' },
+        { property: 'og:title', content: 'bits' },
         {
           property: 'og:description',
           content: 'Reusable mint and gallery frontend for BITS collections.',

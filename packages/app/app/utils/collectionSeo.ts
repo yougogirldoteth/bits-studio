@@ -1,11 +1,11 @@
 import type { BitsCollectionSummary } from '@bits-collection/shared'
 
-const FALLBACK_TITLE = 'BITS Collections'
+const FALLBACK_TITLE = 'bits'
 const FALLBACK_DESCRIPTION =
   'Reusable mint and gallery frontend for BITS collections.'
 
 export function collectionPageTitle(collection?: BitsCollectionSummary) {
-  return collection ? `${collection.title} | BITS Collections` : FALLBACK_TITLE
+  return collection ? `${collection.title} | ${FALLBACK_TITLE}` : FALLBACK_TITLE
 }
 
 export function collectionSeoDescription(collection?: BitsCollectionSummary) {
