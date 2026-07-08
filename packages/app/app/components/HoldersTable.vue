@@ -8,13 +8,6 @@
 
     <div class="bits-holders__scroller">
       <table class="bits-holders__table">
-        <thead>
-          <tr>
-            <th scope="col">Rank</th>
-            <th scope="col">Holder</th>
-            <th scope="col">Tokens</th>
-          </tr>
-        </thead>
         <tbody v-if="holders.length">
           <tr v-for="(holder, index) in holders" :key="holder.owner">
             <td>{{ index + 1 }}</td>

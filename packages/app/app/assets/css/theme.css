@@ -432,7 +432,7 @@ a.bits-description-artist:hover {
 }
 
 .bits-holders__scroller {
-  max-block-size: 18rem;
+  max-block-size: 15.2rem;
   overflow: auto;
 }
 
@@ -443,7 +443,6 @@ a.bits-description-artist:hover {
   font-size: 0.82rem;
 }
 
-.bits-holders__table th,
 .bits-holders__table td {
   padding: 0.72rem var(--bits-card-padding);
   border-block-end: 1px solid var(--bits-rule);
@@ -451,23 +450,11 @@ a.bits-description-artist:hover {
   vertical-align: middle;
 }
 
-.bits-holders__table th {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: 1;
-  background: var(--bits-bg);
-  color: var(--bits-muted);
-  font-size: 0.68rem;
-  font-weight: 600;
-}
-
-.bits-holders__table th:first-child,
 .bits-holders__table td:first-child {
   inline-size: 3.2rem;
   color: var(--bits-muted);
 }
 
-.bits-holders__table th:last-child,
 .bits-holders__table td:last-child {
   text-align: end;
 }
