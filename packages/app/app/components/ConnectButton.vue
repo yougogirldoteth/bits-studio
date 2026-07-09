@@ -1,26 +1,28 @@
 <template>
-  <EvmProfile
-    v-if="connectedAddress"
-    class-name="bits-connect"
-    @disconnected="emit('disconnected')"
-  >
-    <template #default="{ display }">
-      <span>{{ display }}</span>
-    </template>
-  </EvmProfile>
+  <div class="bits-connect-wrap">
+    <EvmProfile
+      v-if="connectedAddress"
+      class-name="bits-button bits-connect"
+      @disconnected="emit('disconnected')"
+    >
+      <template #default="{ display }">
+        <span>{{ display }}</span>
+      </template>
+    </EvmProfile>
 
-  <button v-else class="bits-connect" type="button" @click="open">
-    <span>Connect</span>
-  </button>
+    <button v-else class="bits-button bits-connect" type="button" @click="open">
+      <span>Connect</span>
+    </button>
 
-  <Dialog
-    v-if="!connectedAddress"
-    v-model:open="isOpen"
-    title="Connect Wallet"
-    @closed="onClosed"
-  >
-    <EvmConnect ref="connectRef" @connected="onConnected" />
-  </Dialog>
+    <Dialog
+      v-if="!connectedAddress"
+      v-model:open="isOpen"
+      title="Connect Wallet"
+      @closed="onClosed"
+    >
+      <EvmConnect ref="connectRef" @connected="onConnected" />
+    </Dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -66,38 +68,10 @@ defineExpose({ open })
 </script>
 
 <style>
-.bits-connect {
+.bits-connect-wrap {
   display: inline-flex;
-  block-size: var(--bits-control-height);
-  min-inline-size: auto;
+  inline-size: fit-content;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacer-sm);
-  border: var(--bits-line-ink);
-  border-radius: 0;
-  box-shadow: none;
-  background: var(--bits-bg);
-  color: var(--bits-ink);
-  cursor: pointer;
-  font-size: var(--ui-font-size);
-  font-weight: 600;
-  line-height: 1;
-  padding: 0 var(--ui-padding-inline);
-  text-decoration: none;
-  transition:
-    background-color var(--bits-transition),
-    color var(--bits-transition),
-    opacity var(--bits-transition);
-}
-
-.bits-connect:hover:not(:disabled) {
-  background: var(--bits-ink);
-  color: var(--bits-bg);
-}
-
-.bits-connect:disabled {
-  cursor: not-allowed;
-  opacity: 0.42;
 }
 
 .evm-profile {
