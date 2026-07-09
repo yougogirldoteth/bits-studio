@@ -59,3 +59,87 @@ const emit = defineEmits<{
 const imageSrc = computed(() => imageSrcFromSvg(props.token.svg))
 const htmlSrc = computed(() => htmlSrcdoc(props.token.html))
 </script>
+
+<style scoped>
+.bits-token {
+  min-inline-size: 0;
+  display: grid;
+  grid-template-rows:
+    auto minmax(calc(var(--bits-control-height) * 2.3), auto)
+    auto;
+  gap: 0;
+  border: var(--bits-line);
+  background: var(--bits-bg);
+}
+
+.bits-token[data-sold-out='true'] {
+  color: var(--bits-muted);
+}
+
+.bits-token__media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-block-end: var(--bits-line);
+  background:
+    linear-gradient(
+      var(--bits-rule) var(--border-width),
+      transparent var(--border-width)
+    ),
+    linear-gradient(
+      90deg,
+      var(--bits-rule) var(--border-width),
+      transparent var(--border-width)
+    ),
+    var(--bits-soft);
+  background-size: calc(var(--font-base) * 2) calc(var(--font-base) * 2);
+}
+
+.bits-token__media img,
+.bits-token__media iframe {
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  background: var(--bits-bg);
+}
+
+.bits-token__media img {
+  object-fit: contain;
+}
+
+.bits-token__fallback {
+  max-inline-size: calc(var(--font-base) * 14);
+  padding: var(--spacer);
+  color: var(--bits-muted);
+  font-family: var(--font-mono);
+  font-size: var(--ui-font-size);
+  line-height: 1.35;
+  text-align: center;
+}
+
+.bits-token__body {
+  min-block-size: calc(var(--bits-control-height) * 2.3);
+  display: grid;
+  gap: var(--bits-stack-gap);
+  padding: var(--bits-card-padding);
+}
+
+.bits-token__title {
+  margin: 0;
+  font-size: calc(var(--font-base) * 1.1);
+  font-weight: 500;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.bits-token__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--bits-stack-gap);
+  align-items: center;
+  border-block-start: var(--bits-line);
+  padding: var(--bits-card-padding);
+}
+</style>

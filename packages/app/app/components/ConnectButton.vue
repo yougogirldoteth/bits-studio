@@ -64,3 +64,53 @@ function onClosed() {
 
 defineExpose({ open })
 </script>
+
+<style>
+.bits-connect {
+  display: inline-flex;
+  block-size: var(--bits-control-height);
+  min-inline-size: auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacer-sm);
+  border: var(--bits-line-ink);
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bits-bg);
+  color: var(--bits-ink);
+  cursor: pointer;
+  font-size: var(--ui-font-size);
+  font-weight: 600;
+  line-height: 1;
+  padding: 0 var(--ui-padding-inline);
+  text-decoration: none;
+  transition:
+    background-color var(--bits-transition),
+    color var(--bits-transition),
+    opacity var(--bits-transition);
+}
+
+.bits-connect:hover:not(:disabled) {
+  background: var(--bits-ink);
+  color: var(--bits-bg);
+}
+
+.bits-connect:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.evm-profile {
+  --button-background: var(--bits-bg);
+  --button-background-highlight: var(--bits-soft);
+  --button-color: var(--bits-ink);
+  --button-color-highlight: var(--bits-ink);
+  --button-icon-color: var(--bits-muted);
+  --button-icon-color-highlight: var(--bits-ink);
+}
+
+.evm-profile button.danger:is(:hover, :active, :focus) {
+  background: rgba(255, 107, 95, 0.12);
+  color: var(--bits-error) !important;
+}
+</style>

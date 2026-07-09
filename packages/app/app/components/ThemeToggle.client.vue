@@ -43,3 +43,38 @@ onMounted(() => {
   applyTheme(nextTheme)
 })
 </script>
+
+<style scoped>
+.bits-theme-toggle {
+  position: fixed;
+  inset-block-end: var(--bits-gutter);
+  inset-inline-end: var(--bits-gutter);
+  z-index: 200;
+  inline-size: var(--bits-control-height);
+  block-size: var(--bits-control-height);
+  display: inline-grid;
+  place-items: center;
+  border: var(--bits-line-strong);
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bits-bg);
+  color: var(--bits-ink);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background-color var(--bits-transition),
+    border-color var(--bits-transition),
+    color var(--bits-transition);
+}
+
+.bits-theme-toggle:hover {
+  border-color: var(--bits-ink);
+  background: var(--bits-ink);
+  color: var(--bits-bg);
+}
+
+.bits-theme-toggle :deep(svg) {
+  inline-size: var(--font-base);
+  block-size: var(--font-base);
+}
+</style>
