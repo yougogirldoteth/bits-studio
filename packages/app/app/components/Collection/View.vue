@@ -203,7 +203,7 @@ const fullSetLabel = computed(() => {
   return 'Mint full set'
 })
 const fullSetsRemainingLabel = computed(() => {
-  if (fullSetsRemaining.value === null) {
+  if (fullSetsRemaining.value === null || fullSetsRemaining.value === 0n) {
     return ''
   }
 
