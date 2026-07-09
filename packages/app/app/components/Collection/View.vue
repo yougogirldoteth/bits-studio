@@ -197,7 +197,7 @@ const fullSetLabel = computed(() => {
   }
 
   if (fullSetsRemaining.value === 0n) {
-    return 'Full set sold out'
+    return 'Full sets sold out'
   }
 
   return 'Mint full set'
