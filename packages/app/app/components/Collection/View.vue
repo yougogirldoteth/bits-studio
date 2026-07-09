@@ -100,6 +100,9 @@
         >
           <Icon name="lucide:layers" />
           <span>{{ fullSetLabel }}</span>
+          <span v-if="fullSetsRemainingLabel" class="bits-button__meta">
+            ({{ fullSetsRemainingLabel }})
+          </span>
         </button>
         <div class="bits-segments">
           <button
@@ -171,26 +174,42 @@ const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
 )
+const fullSetsRemaining = computed(() => {
+  if (props.tokens.length < props.collection.tokenCount) {
+    return null
+  }
+
+  if (collectionSoldOut.value) {
+    return 0n
+  }
+
+  return props.tokens.reduce((lowest, token) => {
+    const available = BigInt(token.available)
+    return available < lowest ? available : lowest
+  }, BigInt(props.tokens[0]?.available ?? 0))
+})
 const fullSetUnavailable = computed(
-  () =>
-    collectionSoldOut.value ||
-    props.tokens.length < props.collection.tokenCount ||
-    props.tokens.some((token) => token.soldOut),
+  () => fullSetsRemaining.value === null || fullSetsRemaining.value === 0n,
 )
 const fullSetLabel = computed(() => {
   if (props.tokens.length < props.collection.tokenCount) {
     return 'Indexing full set'
   }
 
-  if (props.tokens.some((token) => token.soldOut)) {
-    return 'Full set unavailable'
-  }
-
-  if (collectionSoldOut.value) {
+  if (fullSetsRemaining.value === 0n) {
     return 'Full set sold out'
   }
 
   return 'Mint full set'
+})
+const fullSetsRemainingLabel = computed(() => {
+  if (fullSetsRemaining.value === null) {
+    return ''
+  }
+
+  return `${formatWholeNumber(fullSetsRemaining.value)} ${
+    fullSetsRemaining.value === 1n ? 'set' : 'sets'
+  } left`
 })
 
 watch(
@@ -245,6 +264,14 @@ async function flushPendingMintIntent() {
 
 function clearPendingMintIntent() {
   pendingMintIntent.value = null
+}
+
+function formatWholeNumber(value: bigint) {
+  if (value <= BigInt(Number.MAX_SAFE_INTEGER)) {
+    return new Intl.NumberFormat('en-US').format(Number(value))
+  }
+
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 </script>
 
@@ -387,6 +414,11 @@ a.bits-description-artist:hover {
 
 .bits-button--mint-set {
   min-inline-size: calc(var(--font-base) * 8.85);
+  white-space: nowrap;
+}
+
+.bits-button__meta {
+  opacity: 0.68;
 }
 
 .bits-button--mint-set:disabled {
