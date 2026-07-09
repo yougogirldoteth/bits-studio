@@ -99,7 +99,7 @@
           @click="mintCollection"
         >
           <Icon name="lucide:layers" />
-          <span>Mint full set</span>
+          <span>{{ fullSetLabel }}</span>
         </button>
         <div class="bits-segments">
           <button
@@ -176,6 +176,21 @@ const fullSetUnavailable = computed(
     props.tokens.length < props.collection.tokenCount ||
     props.tokens.some((token) => token.soldOut),
 )
+const fullSetLabel = computed(() => {
+  if (props.tokens.length < props.collection.tokenCount) {
+    return 'Indexing full set'
+  }
+
+  if (props.tokens.some((token) => token.soldOut)) {
+    return 'Full set unavailable'
+  }
+
+  if (collectionSoldOut.value) {
+    return 'Full set sold out'
+  }
+
+  return 'Mint full set'
+})
 
 watch(
   () => props.address,
