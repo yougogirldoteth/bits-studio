@@ -10,7 +10,9 @@
       <table class="bits-holders__table">
         <tbody v-if="holders.length">
           <tr v-for="(holder, index) in holders" :key="holder.owner">
-            <td>{{ index + 1 }}</td>
+            <td>
+              <span class="bits-holder__rank">{{ index + 1 }}</span>
+            </td>
             <td>
               <a
                 class="bits-holder"
@@ -23,7 +25,11 @@
                 </span>
               </a>
             </td>
-            <td>{{ formatTokenBalance(holder.balance) }}</td>
+            <td>
+              <span class="bits-holder__balance">
+                {{ formatTokenBalance(holder.balance) }}
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -113,11 +119,24 @@ function formatTokenBalance(value: string) {
   border-block-end: 0;
 }
 
+.bits-holder,
+.bits-holder__rank,
+.bits-holder__balance {
+  block-size: calc(var(--bits-control-height) + var(--spacer-sm));
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
 .bits-holder {
-  display: inline-block;
+  inline-size: 100%;
   max-inline-size: 100%;
   color: var(--bits-ink);
   text-decoration: none;
+}
+
+.bits-holder__balance {
+  justify-content: flex-end;
 }
 
 .bits-holder:hover .bits-holder__name {
@@ -128,6 +147,7 @@ function formatTokenBalance(value: string) {
 
 .bits-holder__name {
   display: block;
+  min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
