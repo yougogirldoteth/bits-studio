@@ -442,7 +442,7 @@ a.bits-description-artist:hover {
 }
 
 .bits-holders__scroller {
-  max-block-size: calc(var(--bits-control-height) * 5.65);
+  max-block-size: calc((var(--bits-control-height) + var(--spacer-sm)) * 5);
   overflow: auto;
 }
 
@@ -454,7 +454,8 @@ a.bits-description-artist:hover {
 }
 
 .bits-holders__table td {
-  padding: var(--spacer-sm) var(--bits-card-padding);
+  block-size: calc(var(--bits-control-height) + var(--spacer-sm));
+  padding: 0 var(--bits-card-padding);
   border-block-end: var(--bits-line);
   text-align: start;
   vertical-align: middle;
