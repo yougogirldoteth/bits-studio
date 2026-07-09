@@ -33,6 +33,7 @@ import {
   type BitsCollectionSummary,
   type BitsTokenSummary,
 } from '@bits-collection/shared'
+import CollectionView from '~/components/Collection/View.vue'
 
 const props = defineProps<{
   slug: string

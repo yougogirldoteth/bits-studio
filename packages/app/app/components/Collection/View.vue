@@ -145,6 +145,7 @@ import type {
   BitsHolderSummary,
   BitsTokenSummary,
 } from '@bits-collection/shared'
+import CollectionTokenCard from '~/components/Collection/TokenCard.vue'
 import HoldersTable from '~/components/HoldersTable.vue'
 
 const props = defineProps<{
