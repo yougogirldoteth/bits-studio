@@ -95,7 +95,7 @@
         <button
           class="bits-button bits-button--primary bits-button--mint-set"
           type="button"
-          :disabled="collectionSoldOut"
+          :disabled="fullSetUnavailable"
           @click="mintCollection"
         >
           <Icon name="lucide:layers" />
@@ -170,6 +170,12 @@ const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
 )
+const fullSetUnavailable = computed(
+  () =>
+    collectionSoldOut.value ||
+    props.tokens.length < props.collection.tokenCount ||
+    props.tokens.some((token) => token.soldOut),
+)
 
 watch(
   () => props.address,
@@ -200,7 +206,7 @@ function requestMint(intent: PendingMintIntent) {
 }
 
 function mintCollection() {
-  if (collectionSoldOut.value) return
+  if (fullSetUnavailable.value) return
   requestMint({ type: 'collection' })
 }
 
