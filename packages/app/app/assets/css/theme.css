@@ -438,9 +438,9 @@ a.bits-description-artist:hover {
 
 .bits-holders__table {
   inline-size: 100%;
-  min-inline-size: 32rem;
   border-collapse: collapse;
   font-size: 0.82rem;
+  table-layout: fixed;
 }
 
 .bits-holders__table td {
@@ -451,11 +451,12 @@ a.bits-description-artist:hover {
 }
 
 .bits-holders__table td:first-child {
-  inline-size: 3.2rem;
+  inline-size: 2.35rem;
   color: var(--bits-muted);
 }
 
 .bits-holders__table td:last-child {
+  inline-size: 4.4rem;
   text-align: end;
 }
 
