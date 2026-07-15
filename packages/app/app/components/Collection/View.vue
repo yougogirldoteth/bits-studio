@@ -4,22 +4,13 @@
     :style="{ '--bits-accent': collection.theme?.accent || '#111111' }"
   >
     <div class="bits-shell">
-      <header class="bits-topbar">
-        <div class="bits-brand">
-          <p class="bits-brand__meta">BITS</p>
-          <h1 class="bits-brand__name">{{ collection.title }}</h1>
-        </div>
-        <div class="bits-wallet">
-          <NuxtLink v-if="collections.length > 1" class="bits-button" to="/">
-            Collections
-          </NuxtLink>
-          <ConnectButton
-            ref="connectButton"
-            @closed="clearPendingMintIntent"
-            @connected="flushPendingMintIntent"
-          />
-        </div>
-      </header>
+      <CollectionHeader
+        ref="collectionHeader"
+        :title="collection.title"
+        show-collections
+        @closed="clearPendingMintIntent"
+        @connected="flushPendingMintIntent"
+      />
 
       <section class="bits-section bits-hero">
         <div class="bits-copy">
@@ -153,13 +144,13 @@ import {
   collectionMintStatus,
   isCollectionMintable,
 } from '@bits-collection/shared'
+import CollectionHeader from '~/components/Collection/Header.vue'
 import CollectionTokenCard from '~/components/Collection/TokenCard.vue'
 import HoldersTable from '~/components/HoldersTable.vue'
 
 const props = defineProps<{
   collection: BitsCollectionSummary
   tokens: BitsTokenSummary[]
-  collections: BitsCollectionSummary[]
   holders: BitsHolderSummary[]
   holderTotal: number
   address?: string
@@ -174,7 +165,7 @@ type PendingMintIntent =
   { type: 'collection' } | { type: 'token'; token: BitsTokenSummary }
 
 const mode = ref<'thumbnail' | 'html'>('thumbnail')
-const connectButton = ref<{ open: () => void } | null>(null)
+const collectionHeader = ref<{ openConnect: () => void } | null>(null)
 const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
 const mintStatus = computed(() => collectionMintStatus(props.collection))
 const collectionMintable = computed(() =>
@@ -271,7 +262,7 @@ function requestMint(intent: PendingMintIntent) {
   }
 
   pendingMintIntent.value = intent
-  connectButton.value?.open()
+  collectionHeader.value?.openConnect()
 }
 
 function mintCollection() {
@@ -310,44 +301,6 @@ function formatWholeNumber(value: bigint) {
 </script>
 
 <style scoped>
-.bits-topbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--bits-page-gap);
-  align-items: center;
-  border-block-end: var(--bits-line);
-  padding-block-end: var(--bits-stack-gap);
-}
-
-.bits-brand {
-  display: grid;
-  gap: var(--spacer-sm);
-}
-
-.bits-brand__name {
-  margin: 0;
-  font-size: calc(var(--font-base) * 2.15);
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 1.02;
-}
-
-.bits-brand__meta {
-  color: var(--bits-muted);
-  font-size: var(--ui-font-size);
-  font-weight: 500;
-  line-height: 1.45;
-}
-
-.bits-wallet {
-  align-self: center;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--spacer-sm);
-}
-
 .bits-section {
   min-inline-size: 0;
 }

@@ -3,7 +3,6 @@
     v-if="data"
     :address="address"
     :collection="data.collection"
-    :collections="collections?.items ?? []"
     :holder-total="holders?.total ?? 0"
     :holders="holders?.items ?? []"
     :tokens="data.tokens"
@@ -56,9 +55,6 @@ const { data, error, refresh } = await useAsyncData(
   { watch: [slug] },
 )
 
-const { data: collections } = await useAsyncData('collections', () =>
-  indexer.listCollections(),
-)
 const { data: holders } = await useAsyncData(
   () => `holders:${slug.value}`,
   () =>
