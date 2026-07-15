@@ -32,6 +32,24 @@ test('primary collection exposes the configured token range', () => {
   )
 })
 
+test('second collection exposes its verified onchain configuration', () => {
+  const collection = bitsCollections[1]
+
+  assert.equal(collection.slug, 'drums-collection-2')
+  assert.equal(collection.collectionId, 2n)
+  assert.equal(
+    collection.rendererContract.toLowerCase(),
+    '0xb13dbf35e262e0225a4be90dd318d99864ad0afa',
+  )
+  assert.equal(collection.tokenStartBlock, 25541411)
+  assert.equal(collection.rendererStartBlock, 25541312)
+  assert.equal(collection.editionSize, 69n)
+  assert.deepEqual(
+    tokenIdsForCollection(collection),
+    [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+  )
+})
+
 test('supply and price helpers use bigint math', () => {
   const collection = getPrimaryBitsCollection()
 

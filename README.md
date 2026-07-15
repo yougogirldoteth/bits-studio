@@ -36,7 +36,7 @@ pnpm dev:app
 The app defaults to `http://localhost:3010`; the indexer defaults to
 `http://localhost:42069`.
 
-## First Collection
+## Configured Collections
 
 Drums Collection 1 is configured in `packages/shared/src/collections.ts`:
 
@@ -45,6 +45,15 @@ Drums Collection 1 is configured in `packages/shared/src/collections.ts`:
 - Ethereum mainnet
 - Collection id `1`
 - Token ids `1-16`
+
+Drums Collection 2 shares the BITS contract and is configured with:
+
+- Renderer contract: `0xB13DBF35E262E0225a4be90DD318D99864AD0Afa`
+- Ethereum mainnet
+- Collection id `2`
+- Token ids `17-32`
+- Empty renderer slots remain visible and cannot be minted until their renderer
+  data is created.
 
 ## Indexer API
 
