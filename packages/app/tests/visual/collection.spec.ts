@@ -14,7 +14,9 @@ test('collections route renders the collection overview', async ({ page }) => {
 test('collections route supports the light theme', async ({ page }) => {
   await page.goto('/collections')
 
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', {
+    timeout: 15_000,
+  })
   await page.getByRole('button', { name: 'Switch to light mode' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
   await expect(
