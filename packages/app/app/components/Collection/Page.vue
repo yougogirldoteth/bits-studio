@@ -166,30 +166,3 @@ function tokenMintPriceLabel(collection: BitsCollectionSummary) {
   return formatWeiLabel(BigInt(collection.pricePerTokenWei))
 }
 </script>
-
-<style>
-.bits-page {
-  min-block-size: 100dvh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
-.bits-shell {
-  inline-size: min(100%, calc(var(--font-base) * 118));
-  margin-inline: auto;
-  display: grid;
-  gap: var(--bits-page-gap);
-  padding: var(--bits-gutter);
-}
-
-.bits-empty,
-.bits-error {
-  border: var(--bits-line);
-  padding: calc(var(--spacer-md) * 2);
-  text-align: center;
-}
-
-.bits-error {
-  color: var(--bits-error);
-}
-</style>
