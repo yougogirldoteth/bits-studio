@@ -2,6 +2,7 @@ import { formatEther, getAddress, isAddress } from 'viem'
 import type {
   BitsActivityItem,
   BitsCollectionConfig,
+  BitsCollectionMintStatus,
   BitsCollectionSummary,
   BitsTokenSummary,
 } from './types.ts'
@@ -104,9 +105,25 @@ export function eventId(event: {
 export function createCollectionSummary(
   collection: BitsCollectionConfig,
   minted: bigint,
-  options: { artist?: string } = {},
+  options: {
+    artist?: string
+    indexed?: boolean
+    active?: boolean
+    locked?: boolean
+    rendererContract?: BitsCollectionConfig['rendererContract']
+    tokenCount?: number
+    totalSupply?: bigint
+    pricePerTokenWei?: bigint
+  } = {},
 ): BitsCollectionSummary {
   const artist = options.artist ?? collection.artist
+  const rendererContract =
+    options.rendererContract ?? collection.rendererContract
+  const tokenCount = options.tokenCount ?? collection.tokenCount
+  const totalSupply =
+    options.totalSupply ?? BigInt(tokenCount) * collection.editionSize
+  const pricePerTokenWei =
+    options.pricePerTokenWei ?? collection.pricePerTokenWei
 
   return {
     slug: collection.slug,
@@ -117,20 +134,38 @@ export function createCollectionSummary(
     chainId: collection.chainId,
     collectionId: collection.collectionId.toString(),
     bitsContract: collection.bitsContract,
-    rendererContract: collection.rendererContract,
-    tokenCount: collection.tokenCount,
+    rendererContract,
+    tokenCount,
+    indexed: options.indexed ?? false,
+    active: options.active ?? false,
+    locked: options.locked ?? false,
     minted: minted.toString(),
-    totalSupply: collectionTotalSupply(collection).toString(),
-    pricePerTokenWei: collection.pricePerTokenWei.toString(),
-    priceLabel: formatWeiLabel(collection.pricePerTokenWei),
+    totalSupply: totalSupply.toString(),
+    pricePerTokenWei: pricePerTokenWei.toString(),
+    priceLabel: formatWeiLabel(pricePerTokenWei),
     launchLabel: collection.launchLabel,
     explorerUrl: collectionExplorerUrl(collection),
-    rendererExplorerUrl: rendererExplorerUrl(collection),
+    rendererExplorerUrl: `${collection.explorerBaseUrl}/address/${rendererContract}`,
     artistUrl: artist
       ? `${collection.explorerBaseUrl}/address/${artist}`
       : undefined,
     theme: collection.theme,
   }
+}
+
+export function collectionMintStatus(
+  collection: BitsCollectionSummary,
+): BitsCollectionMintStatus {
+  if (!collection.indexed) return 'indexing'
+  if (BigInt(collection.minted) >= BigInt(collection.totalSupply)) {
+    return 'sold-out'
+  }
+  if (!collection.active || collection.locked) return 'closed'
+  return 'live'
+}
+
+export function isCollectionMintable(collection: BitsCollectionSummary) {
+  return collectionMintStatus(collection) === 'live'
 }
 
 export function createTokenSummary(input: {

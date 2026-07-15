@@ -32,7 +32,7 @@
         :disabled="disabled"
         @click="emit('mint', token)"
       >
-        {{ token.soldOut ? 'Sold out' : 'Mint' }}
+        {{ actionLabel }}
       </button>
     </div>
   </article>
@@ -45,12 +45,16 @@ import {
   type BitsTokenSummary,
 } from '@bits-collection/shared'
 
-const props = defineProps<{
-  token: BitsTokenSummary
-  mode: 'thumbnail' | 'html'
-  priceLabel: string
-  disabled?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    token: BitsTokenSummary
+    mode: 'thumbnail' | 'html'
+    priceLabel: string
+    actionLabel?: string
+    disabled?: boolean
+  }>(),
+  { actionLabel: 'Mint' },
+)
 
 const emit = defineEmits<{
   mint: [token: BitsTokenSummary]

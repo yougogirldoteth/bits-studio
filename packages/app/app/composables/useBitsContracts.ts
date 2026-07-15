@@ -1,4 +1,8 @@
-import { bitsAbi, type BitsCollectionSummary } from '@bits-collection/shared'
+import {
+  bitsAbi,
+  isCollectionMintable,
+  type BitsCollectionSummary,
+} from '@bits-collection/shared'
 import type { Address } from 'viem'
 
 type Hash = `0x${string}`
@@ -21,6 +25,7 @@ export function useBitsContracts() {
 
   function createMintCollectionRequest(collection: BitsCollectionSummary) {
     return () => {
+      requireMintable(collection)
       const { writer, recipient } = requireWriter()
       return writer.writeContractAsync({
         address: collection.bitsContract,
@@ -39,6 +44,7 @@ export function useBitsContracts() {
     tokenId: number,
   ) {
     return () => {
+      requireMintable(collection)
       const { writer, recipient } = requireWriter()
       return writer.writeContractAsync({
         address: collection.bitsContract,
@@ -48,6 +54,12 @@ export function useBitsContracts() {
         chainId: collection.chainId,
         value: BigInt(collection.pricePerTokenWei),
       }) as Promise<Hash>
+    }
+  }
+
+  function requireMintable(collection: BitsCollectionSummary) {
+    if (!isCollectionMintable(collection)) {
+      throw new Error(`${collection.title} is not available to mint.`)
     }
   }
 

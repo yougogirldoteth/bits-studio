@@ -129,7 +129,8 @@
           <CollectionTokenCard
             v-for="token in tokens"
             :key="token.tokenId"
-            :disabled="token.soldOut"
+            :action-label="tokenActionLabel(token)"
+            :disabled="!collectionMintable || token.soldOut"
             :mode="mode"
             :price-label="collection.priceLabel"
             :token="token"
@@ -147,6 +148,10 @@ import type {
   BitsCollectionSummary,
   BitsHolderSummary,
   BitsTokenSummary,
+} from '@bits-collection/shared'
+import {
+  collectionMintStatus,
+  isCollectionMintable,
 } from '@bits-collection/shared'
 import CollectionTokenCard from '~/components/Collection/TokenCard.vue'
 import HoldersTable from '~/components/HoldersTable.vue'
@@ -171,6 +176,10 @@ type PendingMintIntent =
 const mode = ref<'thumbnail' | 'html'>('thumbnail')
 const connectButton = ref<{ open: () => void } | null>(null)
 const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
+const mintStatus = computed(() => collectionMintStatus(props.collection))
+const collectionMintable = computed(() =>
+  isCollectionMintable(props.collection),
+)
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
 )
@@ -183,15 +192,29 @@ const fullSetsRemaining = computed(() => {
     return 0n
   }
 
-  return props.tokens.reduce((lowest, token) => {
-    const available = BigInt(token.available)
-    return available < lowest ? available : lowest
-  }, BigInt(props.tokens[0]?.available ?? 0))
+  return props.tokens.reduce(
+    (lowest, token) => {
+      const available = BigInt(token.available)
+      return available < lowest ? available : lowest
+    },
+    BigInt(props.tokens[0]?.available ?? 0),
+  )
 })
 const fullSetUnavailable = computed(
-  () => fullSetsRemaining.value === null || fullSetsRemaining.value === 0n,
+  () =>
+    !collectionMintable.value ||
+    fullSetsRemaining.value === null ||
+    fullSetsRemaining.value === 0n,
 )
 const fullSetLabel = computed(() => {
+  if (mintStatus.value === 'indexing') {
+    return 'Indexing collection'
+  }
+
+  if (mintStatus.value === 'closed') {
+    return 'Minting closed'
+  }
+
   if (props.tokens.length < props.collection.tokenCount) {
     return 'Indexing full set'
   }
@@ -202,8 +225,19 @@ const fullSetLabel = computed(() => {
 
   return 'Mint full set'
 })
+
+function tokenActionLabel(token: BitsTokenSummary) {
+  if (token.soldOut) return 'Sold out'
+  if (mintStatus.value === 'indexing') return 'Indexing'
+  if (!collectionMintable.value) return 'Unavailable'
+  return 'Mint'
+}
 const fullSetsRemainingLabel = computed(() => {
-  if (fullSetsRemaining.value === null || fullSetsRemaining.value === 0n) {
+  if (
+    !collectionMintable.value ||
+    fullSetsRemaining.value === null ||
+    fullSetsRemaining.value === 0n
+  ) {
     return ''
   }
 

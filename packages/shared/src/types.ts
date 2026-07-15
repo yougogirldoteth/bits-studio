@@ -43,6 +43,9 @@ export type BitsCollectionSummary = {
   bitsContract: Address
   rendererContract: Address
   tokenCount: number
+  indexed: boolean
+  active: boolean
+  locked: boolean
   minted: string
   totalSupply: string
   pricePerTokenWei: string
@@ -53,6 +56,9 @@ export type BitsCollectionSummary = {
   artistUrl?: string
   theme?: BitsCollectionTheme
 }
+
+export type BitsCollectionMintStatus =
+  'indexing' | 'sold-out' | 'closed' | 'live'
 
 export type BitsTokenMetadata = {
   tokenId: number

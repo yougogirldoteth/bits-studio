@@ -2,13 +2,16 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   bitsCollections,
+  collectionMintStatus,
   collectionForToken,
   collectionIncludesTokenId,
   collectionMintPrice,
+  createCollectionSummary,
   collectionTotalSupply,
   collectionsForBitsContract,
   formatWeiLabel,
   getPrimaryBitsCollection,
+  isCollectionMintable,
   tokenAvailable,
   tokenIdsForCollection,
   validateBitsCollections,
@@ -34,6 +37,31 @@ test('supply and price helpers use bigint math', () => {
   assert.equal(collectionTotalSupply(collection), 672n)
   assert.equal(collectionMintPrice(collection), 16_000_000_000_000_000n)
   assert.equal(formatWeiLabel(collection.pricePerTokenWei), '0.001 ETH')
+})
+
+test('collection mint status follows indexed onchain state', () => {
+  const collection = getPrimaryBitsCollection()
+  const indexing = createCollectionSummary(collection, 0n)
+  const live = createCollectionSummary(collection, 0n, {
+    indexed: true,
+    active: true,
+  })
+  const closed = createCollectionSummary(collection, 0n, {
+    indexed: true,
+    active: false,
+  })
+  const soldOut = createCollectionSummary(
+    collection,
+    collectionTotalSupply(collection),
+    { indexed: true, active: true },
+  )
+
+  assert.equal(collectionMintStatus(indexing), 'indexing')
+  assert.equal(collectionMintStatus(live), 'live')
+  assert.equal(collectionMintStatus(closed), 'closed')
+  assert.equal(collectionMintStatus(soldOut), 'sold-out')
+  assert.equal(isCollectionMintable(indexing), false)
+  assert.equal(isCollectionMintable(live), true)
 })
 
 test('token availability never goes negative', () => {

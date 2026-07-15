@@ -89,6 +89,13 @@ async function collectionSummary(
 ) {
   return createCollectionSummary(config, rowMinted(row), {
     artist: await resolveCollectionArtist(config, row),
+    indexed: Boolean(row),
+    active: row?.active ?? false,
+    locked: row?.locked ?? false,
+    rendererContract: row?.renderer_contract,
+    tokenCount: row?.token_count,
+    totalSupply: row?.total_supply,
+    pricePerTokenWei: row?.price_per_token_wei,
   })
 }
 
