@@ -84,7 +84,7 @@ useSeoMeta({
 
 .bits-collections-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 32rem));
   gap: var(--bits-stack-gap);
 }
 

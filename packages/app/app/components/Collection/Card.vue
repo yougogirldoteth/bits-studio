@@ -28,7 +28,6 @@
           — by {{ collection.artist }}
         </span>
       </p>
-      <p class="bits-meta">{{ collection.launchLabel }}</p>
     </div>
 
     <div class="bits-collection-card__stats">
@@ -44,11 +43,6 @@
         <span class="bits-meta">Single</span>
         <strong>{{ collection.priceLabel }}</strong>
       </div>
-    </div>
-
-    <div class="bits-collection-card__footer">
-      <span>View collection</span>
-      <Icon name="lucide:arrow-up-right" />
     </div>
   </NuxtLink>
 </template>
@@ -74,7 +68,7 @@ const statusLabel = computed(
       indexing: 'Indexing',
       'sold-out': 'Sold out',
       closed: 'Closed',
-      live: 'Minting live',
+      live: 'Minting',
     })[status.value],
 )
 
@@ -88,9 +82,11 @@ watch(
 
 <style scoped>
 .bits-collection-card {
+  inline-size: 100%;
+  max-inline-size: 32rem;
   min-inline-size: 0;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto;
   border: var(--bits-line);
   background: var(--bits-bg);
   color: var(--bits-ink);
@@ -209,22 +205,6 @@ watch(
   font-size: var(--ui-font-size);
   font-weight: 600;
   overflow-wrap: anywhere;
-}
-
-.bits-collection-card__footer {
-  display: flex;
-  block-size: var(--bits-control-height);
-  align-items: center;
-  justify-content: space-between;
-  border-block-start: var(--bits-line);
-  font-size: var(--ui-font-size);
-  font-weight: 600;
-  padding-inline: var(--bits-card-padding);
-}
-
-.bits-collection-card__footer :deep(svg) {
-  inline-size: var(--font-base);
-  block-size: var(--font-base);
 }
 
 @media (max-width: 520px) {

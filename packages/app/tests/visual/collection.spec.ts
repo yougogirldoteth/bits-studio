@@ -6,9 +6,20 @@ test('collections route renders the collection overview', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Collections', exact: true }),
   ).toBeVisible()
+  const collectionCard = page.getByRole('link', {
+    name: /Drums Collection 1/i,
+  })
+  await expect(collectionCard).toBeVisible()
+  await expect(collectionCard).toHaveAttribute(
+    'href',
+    '/collections/drums-collection-1',
+  )
+  await expect(page.getByText('View collection')).toHaveCount(0)
   await expect(
-    page.getByRole('link', { name: /Drums Collection 1/i }),
-  ).toBeVisible()
+    page.getByText('Minting is live on Ethereum mainnet.'),
+  ).toHaveCount(0)
+  await collectionCard.click()
+  await expect(page).toHaveURL(/\/collections\/drums-collection-1$/)
 })
 
 test('collections route supports the light theme', async ({ page }) => {
