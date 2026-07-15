@@ -5,7 +5,9 @@ import { bitsAbi } from '@bits-collection/shared'
 import {
   BITS_CONTRACT_NAME,
   BITS_START_BLOCK,
+  INDEXED_COLLECTIONS,
   INDEXED_BITS_CONTRACTS,
+  bootstrapNameForCollection,
 } from './utils/collections.ts'
 
 const chainId = 1
@@ -31,6 +33,18 @@ const rpcTransport = fallbackRpcUrls.length
     ])
   : primaryTransport
 
+const collectionBootstraps = Object.fromEntries(
+  INDEXED_COLLECTIONS.map((collection) => [
+    bootstrapNameForCollection(collection),
+    {
+      chain: collection.chain,
+      startBlock: collection.tokenStartBlock,
+      endBlock: collection.tokenStartBlock,
+      interval: 1,
+    },
+  ]),
+)
+
 export default createConfig({
   chains: {
     mainnet: {
@@ -47,4 +61,5 @@ export default createConfig({
       startBlock: BITS_START_BLOCK,
     },
   },
+  blocks: collectionBootstraps,
 })

@@ -20,6 +20,10 @@ export const BITS_START_BLOCK = Math.min(
   ...INDEXED_COLLECTIONS.map((collection) => collection.tokenStartBlock),
 )
 
+export function bootstrapNameForCollection(collection: BitsCollectionConfig) {
+  return `Bootstrap_${collection.slug.replace(/-/g, '_')}`
+}
+
 export function indexedCollectionsForContract(bitsContract: string) {
   return collectionsForBitsContract(INDEXED_COLLECTIONS, bitsContract)
 }
@@ -50,6 +54,53 @@ export function groupTokenItemsByCollection<T extends { tokenId: number }>(
   }
 
   return Array.from(grouped.values())
+}
+
+export function assertCollectionStateMatches(
+  collection: BitsCollectionConfig,
+  state: {
+    startTokenId: number
+    tokenCount: number
+    editionSize: bigint
+    renderer: string
+    pricePerTokenWei: bigint
+  },
+) {
+  const mismatches: string[] = []
+
+  if (state.startTokenId !== collection.startTokenId) {
+    mismatches.push(
+      `start token ${state.startTokenId} (configured ${collection.startTokenId})`,
+    )
+  }
+  if (state.tokenCount !== collection.tokenCount) {
+    mismatches.push(
+      `token count ${state.tokenCount} (configured ${collection.tokenCount})`,
+    )
+  }
+  if (state.editionSize !== collection.editionSize) {
+    mismatches.push(
+      `edition size ${state.editionSize} (configured ${collection.editionSize})`,
+    )
+  }
+  if (
+    state.renderer.toLowerCase() !== collection.rendererContract.toLowerCase()
+  ) {
+    mismatches.push(
+      `renderer ${state.renderer} (configured ${collection.rendererContract})`,
+    )
+  }
+  if (state.pricePerTokenWei !== collection.pricePerTokenWei) {
+    mismatches.push(
+      `price ${state.pricePerTokenWei} (configured ${collection.pricePerTokenWei})`,
+    )
+  }
+
+  if (mismatches.length) {
+    throw new Error(
+      `Collection ${collection.slug} does not match onchain state: ${mismatches.join(', ')}`,
+    )
+  }
 }
 
 export function tokenRowId(collection: BitsCollectionConfig, tokenId: number) {

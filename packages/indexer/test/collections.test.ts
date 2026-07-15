@@ -4,7 +4,9 @@ import { getPrimaryBitsCollection } from '@bits-collection/shared'
 import {
   BITS_CONTRACT_NAME,
   INDEXED_BITS_CONTRACTS,
+  assertCollectionStateMatches,
   balanceRowId,
+  bootstrapNameForCollection,
   groupTokenItemsByCollection,
   indexedCollectionForToken,
   indexedCollectionsForContract,
@@ -19,6 +21,10 @@ test('indexes each bits contract once', () => {
   assert.deepEqual(indexedCollectionsForContract(collection.bitsContract), [
     collection,
   ])
+  assert.equal(
+    bootstrapNameForCollection(collection),
+    'Bootstrap_drums_collection_1',
+  )
 })
 
 test('routes configured token ids and ignores unknown ids', () => {
@@ -46,5 +52,27 @@ test('derives stable token and balance row ids', () => {
   assert.equal(
     balanceRowId({ collection, tokenId: 7, owner }),
     'drums-collection-1:7:0xcb7504c4cb986e80ab4983b44263381f21273482',
+  )
+})
+
+test('rejects collection state that differs from configuration', () => {
+  const collection = getPrimaryBitsCollection()
+  const state = {
+    startTokenId: collection.startTokenId,
+    tokenCount: collection.tokenCount,
+    editionSize: collection.editionSize,
+    renderer: collection.rendererContract,
+    pricePerTokenWei: collection.pricePerTokenWei,
+  }
+
+  assert.doesNotThrow(() => assertCollectionStateMatches(collection, state))
+  assert.throws(
+    () =>
+      assertCollectionStateMatches(collection, {
+        ...state,
+        startTokenId: 17,
+        renderer: '0x1111111111111111111111111111111111111111',
+      }),
+    /does not match onchain state: start token 17.*renderer/,
   )
 })

@@ -5,10 +5,10 @@ import {
   bitsAbi,
   bitsRendererV1Abi,
   collectionIncludesTokenId,
-  collectionTotalSupply,
   eventId,
   getRendererAdapter,
   tokenAvailable,
+  tokenIdsForCollection,
   type BitsCollectionConfig,
   type BitsRendererBitTuple,
 } from '@bits-collection/shared'
@@ -21,7 +21,10 @@ import {
 import { zeroAddress, type Address, type PublicClient } from 'viem'
 import {
   BITS_CONTRACT_NAME,
+  INDEXED_COLLECTIONS,
+  assertCollectionStateMatches,
   balanceRowId,
+  bootstrapNameForCollection,
   groupTokenItemsByCollection,
   indexedCollectionForToken,
   indexedCollectionsForContract,
@@ -67,6 +70,7 @@ async function ensureCollection(
   timestamp: bigint,
 ) {
   const state = await readCollectionState(context, collection)
+  assertCollectionStateMatches(collection, state)
   const artist = await resolveOnchainArtist(
     context.client as PublicClient,
     collection,
@@ -82,14 +86,13 @@ async function ensureCollection(
       chain_id: collection.chainId,
       collection_id: collection.collectionId,
       bits_contract: collection.bitsContract,
-      renderer_contract: collection.rendererContract,
-      start_token_id: state.startTokenId || collection.startTokenId,
-      token_count: state.tokenCount || collection.tokenCount,
-      edition_size: state.editionSize || collection.editionSize,
+      renderer_contract: state.renderer,
+      start_token_id: state.startTokenId,
+      token_count: state.tokenCount,
+      edition_size: state.editionSize,
       minted: state.minted,
-      total_supply: collectionTotalSupply(collection),
-      price_per_token_wei:
-        state.pricePerTokenWei || collection.pricePerTokenWei,
+      total_supply: BigInt(state.tokenCount) * state.editionSize,
+      price_per_token_wei: state.pricePerTokenWei,
       active: state.active,
       locked: state.locked,
       updated_at: timestamp,
@@ -102,17 +105,29 @@ async function ensureCollection(
     chain_id: collection.chainId,
     collection_id: collection.collectionId,
     bits_contract: collection.bitsContract,
-    renderer_contract: collection.rendererContract,
-    start_token_id: state.startTokenId || collection.startTokenId,
-    token_count: state.tokenCount || collection.tokenCount,
-    edition_size: state.editionSize || collection.editionSize,
+    renderer_contract: state.renderer,
+    start_token_id: state.startTokenId,
+    token_count: state.tokenCount,
+    edition_size: state.editionSize,
     minted: state.minted,
-    total_supply: collectionTotalSupply(collection),
-    price_per_token_wei: state.pricePerTokenWei || collection.pricePerTokenWei,
+    total_supply: BigInt(state.tokenCount) * state.editionSize,
+    price_per_token_wei: state.pricePerTokenWei,
     active: state.active,
     locked: state.locked,
     updated_at: timestamp,
   })
+}
+
+async function bootstrapCollection(
+  context: PonderContext,
+  collection: BitsCollectionConfig,
+  timestamp: bigint,
+) {
+  await ensureCollection(context, collection, timestamp)
+
+  for (const tokenId of tokenIdsForCollection(collection)) {
+    await refreshToken(context, collection, tokenId, timestamp)
+  }
 }
 
 async function refreshToken(
@@ -336,6 +351,21 @@ ponder.on(
     )
   },
 )
+
+for (const collection of INDEXED_COLLECTIONS) {
+  ponder.on(
+    `${bootstrapNameForCollection(collection)}:block` as never,
+    async ({
+      event,
+      context,
+    }: {
+      event: { block: { timestamp: bigint } }
+      context: PonderContext
+    }) => {
+      await bootstrapCollection(context, collection, event.block.timestamp)
+    },
+  )
+}
 
 ponder.on(
   `${BITS_CONTRACT_NAME}:TransferBatch` as never,
