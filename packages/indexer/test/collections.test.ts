@@ -10,6 +10,7 @@ import {
   groupTokenItemsByCollection,
   indexedCollectionForToken,
   indexedCollectionsForContract,
+  indexedCollectionsForContractAtBlock,
   tokenRowId,
 } from '../utils/collections.ts'
 
@@ -24,6 +25,20 @@ test('indexes each bits contract once', () => {
   assert.equal(
     bootstrapNameForCollection(collection),
     'Bootstrap_drums_collection_1',
+  )
+  assert.deepEqual(
+    indexedCollectionsForContractAtBlock(
+      collection.bitsContract,
+      BigInt(collection.tokenStartBlock - 1),
+    ),
+    [],
+  )
+  assert.deepEqual(
+    indexedCollectionsForContractAtBlock(
+      collection.bitsContract,
+      BigInt(collection.tokenStartBlock),
+    ),
+    [collection],
   )
 })
 

@@ -27,6 +27,15 @@ export function indexedCollectionsForContract(bitsContract: string) {
   return collectionsForBitsContract(INDEXED_COLLECTIONS, bitsContract)
 }
 
+export function indexedCollectionsForContractAtBlock(
+  bitsContract: string,
+  blockNumber: bigint,
+) {
+  return indexedCollectionsForContract(bitsContract).filter(
+    (collection) => BigInt(collection.tokenStartBlock) <= blockNumber,
+  )
+}
+
 export function indexedCollectionForToken(
   bitsContract: string,
   tokenId: number,

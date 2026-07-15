@@ -28,6 +28,7 @@ import {
   groupTokenItemsByCollection,
   indexedCollectionForToken,
   indexedCollectionsForContract,
+  indexedCollectionsForContractAtBlock,
   tokenRowId,
 } from '../utils/collections.ts'
 import { resolveOnchainArtist } from './artist.ts'
@@ -473,7 +474,10 @@ ponder.on(
     context: PonderContext
   }) => {
     await Promise.all(
-      indexedCollectionsForContract(event.log.address).map((collection) =>
+      indexedCollectionsForContractAtBlock(
+        event.log.address,
+        event.block.number,
+      ).map((collection) =>
         Promise.all([
           recordActivity(context, collection, event, {
             idSuffix: `-${collection.slug}`,

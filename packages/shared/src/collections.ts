@@ -15,7 +15,7 @@ export const bitsCollections = [
     collectionId: 1n,
     startTokenId: 1,
     tokenCount: 16,
-    tokenStartBlock: 25488778,
+    tokenStartBlock: 25489308,
     rendererStartBlock: 25468403,
     rendererAdapter: 'bits-renderer-v1',
     editionSize: 42n,
