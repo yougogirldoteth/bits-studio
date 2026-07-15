@@ -23,6 +23,38 @@ export function tokenIdsForCollection(collection: BitsCollectionConfig) {
   )
 }
 
+export function collectionIncludesTokenId(
+  collection: BitsCollectionConfig,
+  tokenId: number,
+) {
+  return (
+    tokenId >= collection.startTokenId &&
+    tokenId < collection.startTokenId + collection.tokenCount
+  )
+}
+
+export function collectionsForBitsContract(
+  collections: readonly BitsCollectionConfig[],
+  bitsContract: string,
+) {
+  const address = bitsContract.toLowerCase()
+  return collections.filter(
+    (collection) => collection.bitsContract.toLowerCase() === address,
+  )
+}
+
+export function collectionForToken(
+  collections: readonly BitsCollectionConfig[],
+  bitsContract: string,
+  tokenId: number,
+) {
+  return (
+    collectionsForBitsContract(collections, bitsContract).find((collection) =>
+      collectionIncludesTokenId(collection, tokenId),
+    ) ?? null
+  )
+}
+
 export function collectionTotalSupply(collection: BitsCollectionConfig) {
   return BigInt(collection.tokenCount) * collection.editionSize
 }

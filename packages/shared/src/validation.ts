@@ -6,6 +6,7 @@ export function validateBitsCollections(
   collections: readonly BitsCollectionConfig[],
 ) {
   const slugs = new Set<string>()
+  const contractCollectionIds = new Set<string>()
 
   for (const collection of collections) {
     validateBitsCollection(collection)
@@ -14,9 +15,62 @@ export function validateBitsCollections(
       throw new Error(`Duplicate collection slug: ${collection.slug}`)
     }
     slugs.add(collection.slug)
+
+    const contractCollectionId = [
+      collection.chainId,
+      collection.bitsContract.toLowerCase(),
+      collection.collectionId,
+    ].join(':')
+
+    if (contractCollectionIds.has(contractCollectionId)) {
+      throw new Error(
+        `Duplicate collection id ${collection.collectionId} for BITS contract ${collection.bitsContract}`,
+      )
+    }
+    contractCollectionIds.add(contractCollectionId)
+  }
+
+  const primaryCount = collections.filter(
+    (collection) => collection.primary,
+  ).length
+  if (primaryCount !== 1) {
+    throw new Error(
+      `Expected exactly one primary collection, received ${primaryCount}`,
+    )
+  }
+
+  for (let index = 0; index < collections.length; index++) {
+    const collection = collections[index]!
+
+    for (
+      let otherIndex = index + 1;
+      otherIndex < collections.length;
+      otherIndex++
+    ) {
+      const other = collections[otherIndex]!
+      const sharesContract =
+        collection.chainId === other.chainId &&
+        collection.bitsContract.toLowerCase() ===
+          other.bitsContract.toLowerCase()
+
+      if (sharesContract && tokenRangesOverlap(collection, other)) {
+        throw new Error(
+          `Overlapping token ranges: ${collection.slug} and ${other.slug}`,
+        )
+      }
+    }
   }
 
   return collections
+}
+
+function tokenRangesOverlap(
+  left: BitsCollectionConfig,
+  right: BitsCollectionConfig,
+) {
+  const leftEnd = left.startTokenId + left.tokenCount
+  const rightEnd = right.startTokenId + right.tokenCount
+  return left.startTokenId < rightEnd && right.startTokenId < leftEnd
 }
 
 export function validateBitsCollection(collection: BitsCollectionConfig) {

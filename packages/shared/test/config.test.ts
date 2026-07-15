@@ -2,8 +2,11 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   bitsCollections,
+  collectionForToken,
+  collectionIncludesTokenId,
   collectionMintPrice,
   collectionTotalSupply,
+  collectionsForBitsContract,
   formatWeiLabel,
   getPrimaryBitsCollection,
   tokenAvailable,
@@ -45,6 +48,96 @@ test('duplicate collection slugs fail loudly', () => {
   assert.throws(
     () => validateBitsCollections([collection, collection]),
     /Duplicate collection slug/,
+  )
+})
+
+test('same-contract collections resolve by token range', () => {
+  const [primary] = bitsCollections
+  const second = {
+    ...primary,
+    slug: 'drums-collection-2',
+    rendererContract: '0x1111111111111111111111111111111111111111',
+    collectionId: 2n,
+    startTokenId: 17,
+    primary: false,
+  } as const
+  const collections = [primary, second]
+
+  assert.doesNotThrow(() => validateBitsCollections(collections))
+  assert.equal(collectionIncludesTokenId(primary, 1), true)
+  assert.equal(collectionIncludesTokenId(primary, 16), true)
+  assert.equal(collectionIncludesTokenId(primary, 17), false)
+  assert.deepEqual(
+    collectionsForBitsContract(collections, primary.bitsContract),
+    collections,
+  )
+  assert.equal(
+    collectionForToken(collections, primary.bitsContract, 16)?.slug,
+    primary.slug,
+  )
+  assert.equal(
+    collectionForToken(collections, primary.bitsContract, 17)?.slug,
+    second.slug,
+  )
+  assert.equal(collectionForToken(collections, primary.bitsContract, 33), null)
+})
+
+test('duplicate contract collection ids fail loudly', () => {
+  const [primary] = bitsCollections
+
+  assert.throws(
+    () =>
+      validateBitsCollections([
+        primary,
+        {
+          ...primary,
+          slug: 'drums-collection-2',
+          startTokenId: 17,
+          primary: false,
+        },
+      ]),
+    /Duplicate collection id/,
+  )
+})
+
+test('overlapping same-contract token ranges fail loudly', () => {
+  const [primary] = bitsCollections
+
+  assert.throws(
+    () =>
+      validateBitsCollections([
+        primary,
+        {
+          ...primary,
+          slug: 'drums-collection-2',
+          collectionId: 2n,
+          startTokenId: 16,
+          primary: false,
+        },
+      ]),
+    /Overlapping token ranges/,
+  )
+})
+
+test('collections require exactly one primary', () => {
+  const [primary] = bitsCollections
+
+  assert.throws(
+    () => validateBitsCollections([{ ...primary, primary: false }]),
+    /exactly one primary collection/,
+  )
+  assert.throws(
+    () =>
+      validateBitsCollections([
+        primary,
+        {
+          ...primary,
+          slug: 'drums-collection-2',
+          collectionId: 2n,
+          startTokenId: 17,
+        },
+      ]),
+    /exactly one primary collection/,
   )
 })
 
