@@ -3,8 +3,9 @@ import { createConfig } from 'ponder'
 import { fallback, http } from 'viem'
 import { bitsAbi } from '@bits-collection/shared'
 import {
-  INDEXED_COLLECTIONS,
-  contractNameForCollection,
+  BITS_CONTRACT_NAME,
+  BITS_START_BLOCK,
+  INDEXED_BITS_CONTRACTS,
 } from './utils/collections.ts'
 
 const chainId = 1
@@ -30,18 +31,6 @@ const rpcTransport = fallbackRpcUrls.length
     ])
   : primaryTransport
 
-const contracts = Object.fromEntries(
-  INDEXED_COLLECTIONS.map((collection) => [
-    contractNameForCollection(collection),
-    {
-      chain: collection.chain,
-      abi: bitsAbi,
-      address: collection.bitsContract,
-      startBlock: collection.tokenStartBlock,
-    },
-  ]),
-)
-
 export default createConfig({
   chains: {
     mainnet: {
@@ -50,5 +39,12 @@ export default createConfig({
       ws: wsUrl,
     },
   },
-  contracts,
+  contracts: {
+    [BITS_CONTRACT_NAME]: {
+      chain: 'mainnet',
+      abi: bitsAbi,
+      address: INDEXED_BITS_CONTRACTS,
+      startBlock: BITS_START_BLOCK,
+    },
+  },
 })

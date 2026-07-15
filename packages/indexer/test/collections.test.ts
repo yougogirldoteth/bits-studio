@@ -2,15 +2,40 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getPrimaryBitsCollection } from '@bits-collection/shared'
 import {
+  BITS_CONTRACT_NAME,
+  INDEXED_BITS_CONTRACTS,
   balanceRowId,
-  contractNameForCollection,
+  groupTokenItemsByCollection,
+  indexedCollectionForToken,
+  indexedCollectionsForContract,
   tokenRowId,
 } from '../utils/collections.ts'
 
-test('derives stable contract names from collection slugs', () => {
+test('indexes each bits contract once', () => {
   const collection = getPrimaryBitsCollection()
 
-  assert.equal(contractNameForCollection(collection), 'Bits_drums_collection_1')
+  assert.equal(BITS_CONTRACT_NAME, 'Bits')
+  assert.deepEqual(INDEXED_BITS_CONTRACTS, [collection.bitsContract])
+  assert.deepEqual(indexedCollectionsForContract(collection.bitsContract), [
+    collection,
+  ])
+})
+
+test('routes configured token ids and ignores unknown ids', () => {
+  const collection = getPrimaryBitsCollection()
+
+  assert.equal(
+    indexedCollectionForToken(collection.bitsContract, 1)?.slug,
+    collection.slug,
+  )
+  assert.equal(indexedCollectionForToken(collection.bitsContract, 17), null)
+  assert.deepEqual(
+    groupTokenItemsByCollection(collection.bitsContract, [
+      { tokenId: 1, value: 2n },
+      { tokenId: 17, value: 1n },
+    ]),
+    [{ collection, items: [{ tokenId: 1, value: 2n }] }],
+  )
 })
 
 test('derives stable token and balance row ids', () => {
