@@ -2,11 +2,10 @@ import {
   bitsCollections,
   collectionForToken,
   collectionsForBitsContract,
-  validateBitsCollections,
   type BitsCollectionConfig,
 } from '@bits-collection/shared'
 
-export const INDEXED_COLLECTIONS = validateBitsCollections(bitsCollections)
+export const INDEXED_COLLECTIONS = bitsCollections
 export const BITS_CONTRACT_NAME = 'Bits'
 export const INDEXED_BITS_CONTRACTS = Array.from(
   new Map(

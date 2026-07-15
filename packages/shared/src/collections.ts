@@ -1,4 +1,5 @@
 import type { BitsCollectionConfig } from './types.ts'
+import { validateBitsCollections } from './validation.ts'
 
 export const bitsCollections = [
   {
@@ -29,6 +30,8 @@ export const bitsCollections = [
   },
 ] as const satisfies readonly BitsCollectionConfig[]
 
+validateBitsCollections(bitsCollections)
+
 export type BitsCollectionSlug = (typeof bitsCollections)[number]['slug']
 
 export function getBitsCollection(slug: string) {
@@ -36,8 +39,5 @@ export function getBitsCollection(slug: string) {
 }
 
 export function getPrimaryBitsCollection() {
-  return (
-    bitsCollections.find((collection) => collection.primary) ??
-    bitsCollections[0]
-  )
+  return bitsCollections.find((collection) => collection.primary)!
 }
