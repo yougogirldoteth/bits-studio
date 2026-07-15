@@ -1,5 +1,9 @@
 <template>
-  <article class="bits-token" :data-sold-out="token.soldOut">
+  <article
+    class="bits-token"
+    :data-created="token.created"
+    :data-sold-out="token.soldOut"
+  >
     <div class="bits-token__media">
       <iframe
         v-if="mode === 'html' && token.html"
@@ -12,7 +16,15 @@
         :alt="`${token.name || `Token ${token.tokenId}`} thumbnail`"
         :src="imageSrc"
       />
-      <div v-else class="bits-token__fallback">Token {{ token.tokenId }}</div>
+      <div v-else class="bits-token__fallback">
+        <span
+          v-if="!token.created"
+          aria-hidden="true"
+          class="bits-token__empty-mark"
+        />
+        <span>Token {{ token.tokenId }}</span>
+        <span v-if="!token.created">Not created yet</span>
+      </div>
     </div>
 
     <div class="bits-token__body">
@@ -20,7 +32,10 @@
         {{ token.name || `Token ${token.tokenId}` }}
       </h2>
       <div class="bits-meta">
-        {{ token.minted }} / {{ token.editionSize }} minted
+        <template v-if="token.created">
+          {{ token.minted }} / {{ token.editionSize }} minted
+        </template>
+        <template v-else>Awaiting renderer data</template>
       </div>
     </div>
 
@@ -80,6 +95,10 @@ const htmlSrc = computed(() => htmlSrcdoc(props.token.html))
   color: var(--bits-muted);
 }
 
+.bits-token[data-created='false'] {
+  color: var(--bits-muted);
+}
+
 .bits-token__media {
   position: relative;
   display: grid;
@@ -115,12 +134,34 @@ const htmlSrc = computed(() => htmlSrcdoc(props.token.html))
 
 .bits-token__fallback {
   max-inline-size: calc(var(--font-base) * 14);
+  display: grid;
+  justify-items: center;
+  gap: var(--spacer-sm);
   padding: var(--spacer);
   color: var(--bits-muted);
   font-family: var(--font-mono);
   font-size: var(--ui-font-size);
   line-height: 1.35;
   text-align: center;
+}
+
+.bits-token__empty-mark {
+  inline-size: calc(var(--font-base) * 2.5);
+  aspect-ratio: 1;
+  border: var(--bits-line-strong);
+  background:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - var(--border-width)),
+      var(--bits-rule-strong) 50%,
+      transparent calc(50% + var(--border-width))
+    ),
+    linear-gradient(
+      -45deg,
+      transparent calc(50% - var(--border-width)),
+      var(--bits-rule-strong) 50%,
+      transparent calc(50% + var(--border-width))
+    );
 }
 
 .bits-token__body {

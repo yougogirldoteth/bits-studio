@@ -10,6 +10,13 @@ const GRID_PADDING = 71
 const GRID_GUTTER = 8
 const BLANK_IMAGE =
   'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/%3E'
+const EMPTY_TOKEN_IMAGE = `data:image/svg+xml,${encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+    <rect width="600" height="600" fill="#10100f"/>
+    <path d="M0 0 600 600M600 0 0 600" stroke="#343431" stroke-width="2"/>
+    <rect x="249" y="249" width="102" height="102" fill="none" stroke="#5b5a55" stroke-width="2"/>
+  </svg>
+`)}`
 
 export async function renderCollectionOgGrid(
   artwork: readonly BitsTokenArtwork[],
@@ -17,12 +24,10 @@ export async function renderCollectionOgGrid(
   const images: Img[] = []
   for (const token of artwork) {
     const url = imageSrcFromSvg(token.svg)
-    if (url) {
-      images.push({
-        id: String(token.tokenId),
-        url,
-      })
-    }
+    images.push({
+      id: String(token.tokenId),
+      url: url || EMPTY_TOKEN_IMAGE,
+    })
   }
 
   if (images.length === 0) return null

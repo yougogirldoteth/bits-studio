@@ -11,6 +11,7 @@ import {
   collectionsForBitsContract,
   formatWeiLabel,
   getPrimaryBitsCollection,
+  getRendererAdapter,
   isCollectionMintable,
   tokenAvailable,
   tokenIdsForCollection,
@@ -68,6 +69,25 @@ test('token availability never goes negative', () => {
   assert.equal(tokenAvailable(11n, 42n), 31n)
   assert.equal(tokenAvailable(42n, 42n), 0n)
   assert.equal(tokenAvailable(43n, 42n), 0n)
+})
+
+test('renderer metadata distinguishes empty token slots', () => {
+  const adapter = getRendererAdapter('bits-renderer-v1')
+  const empty = adapter.normalize({
+    tokenId: 17,
+    bit: ['', '', '', '', 0],
+    svg: '',
+    html: '',
+  })
+  const created = adapter.normalize({
+    tokenId: 17,
+    bit: ['myth kick', 'dLk1.mp3', 'myth kick.svg', 'LinnDrum', 0],
+    svg: 'svg',
+    html: 'html',
+  })
+
+  assert.equal(empty.created, false)
+  assert.equal(created.created, true)
 })
 
 test('duplicate collection slugs fail loudly', () => {

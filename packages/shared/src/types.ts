@@ -62,6 +62,7 @@ export type BitsCollectionMintStatus =
 
 export type BitsTokenMetadata = {
   tokenId: number
+  created: boolean
   name: string
   audioFilename: string
   svgFilename: string

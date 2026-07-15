@@ -15,6 +15,7 @@ import {
   bitsCollections,
   createCollectionSummary,
   getBitsCollection,
+  isRendererBitCreated,
   tokenAvailable,
   type BitsActivityItem,
   type BitsCollectionConfig,
@@ -106,6 +107,13 @@ function tokenSummary(row: TokenRow): BitsTokenSummary {
   return {
     tokenId: row.token_id,
     collectionSlug: row.collection_slug,
+    created: isRendererBitCreated([
+      row.name,
+      row.audio_filename,
+      row.svg_filename,
+      row.source,
+      row.processed,
+    ]),
     name: row.name,
     audioFilename: row.audio_filename,
     svgFilename: row.svg_filename,

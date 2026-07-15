@@ -107,7 +107,7 @@ function startCollectionMint() {
 }
 
 function startTokenMint(token: BitsTokenSummary) {
-  if (!data.value) return
+  if (!data.value || !token.created) return
   const { collection } = data.value
   const tokenLabel = token.name || `Token ${token.tokenId}`
 

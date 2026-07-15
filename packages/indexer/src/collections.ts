@@ -7,6 +7,7 @@ import {
   collectionIncludesTokenId,
   eventId,
   getRendererAdapter,
+  isRendererBitCreated,
   tokenAvailable,
   tokenIdsForCollection,
   type BitsCollectionConfig,
@@ -138,7 +139,7 @@ async function refreshToken(
   timestamp: bigint,
 ) {
   const adapter = getRendererAdapter(collection.rendererAdapter)
-  const [minted, bit, svg, html] = await Promise.all([
+  const [minted, bit] = await Promise.all([
     context.client.readContract({
       abi: bitsAbi,
       address: collection.bitsContract,
@@ -151,22 +152,27 @@ async function refreshToken(
       functionName: 'bits',
       args: [BigInt(tokenId)],
     }),
-    context.client.readContract({
-      abi: bitsRendererV1Abi,
-      address: collection.rendererContract,
-      functionName: 'tokenToSvg',
-      args: [BigInt(tokenId)],
-    }),
-    context.client.readContract({
-      abi: bitsRendererV1Abi,
-      address: collection.rendererContract,
-      functionName: 'tokenToHtml',
-      args: [BigInt(tokenId)],
-    }),
   ])
+  const rendererBit = bit as BitsRendererBitTuple
+  const [svg, html] = isRendererBitCreated(rendererBit)
+    ? await Promise.all([
+        context.client.readContract({
+          abi: bitsRendererV1Abi,
+          address: collection.rendererContract,
+          functionName: 'tokenToSvg',
+          args: [BigInt(tokenId)],
+        }),
+        context.client.readContract({
+          abi: bitsRendererV1Abi,
+          address: collection.rendererContract,
+          functionName: 'tokenToHtml',
+          args: [BigInt(tokenId)],
+        }),
+      ])
+    : ['', '']
   const metadata = adapter.normalize({
     tokenId,
-    bit: bit as BitsRendererBitTuple,
+    bit: rendererBit,
     svg,
     html,
     rendererUpdatedAt: Number(timestamp),

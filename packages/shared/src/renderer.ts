@@ -38,6 +38,7 @@ export const bitsRendererV1Adapter: BitsRendererAdapter = {
 
     return {
       tokenId: result.tokenId,
+      created: isRendererBitCreated(result.bit),
       name,
       audioFilename,
       svgFilename,
@@ -48,6 +49,10 @@ export const bitsRendererV1Adapter: BitsRendererAdapter = {
       rendererUpdatedAt: result.rendererUpdatedAt,
     }
   },
+}
+
+export function isRendererBitCreated(bit: BitsRendererBitTuple) {
+  return bit.slice(0, 4).some((value) => String(value).trim().length > 0)
 }
 
 export const rendererAdapters = {

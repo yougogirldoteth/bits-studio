@@ -121,7 +121,7 @@
             v-for="token in tokens"
             :key="token.tokenId"
             :action-label="tokenActionLabel(token)"
-            :disabled="!collectionMintable || token.soldOut"
+            :disabled="!token.created || !collectionMintable || token.soldOut"
             :mode="mode"
             :price-label="collection.priceLabel"
             :token="token"
@@ -174,8 +174,13 @@ const collectionMintable = computed(() =>
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
 )
+const allTokensCreated = computed(
+  () =>
+    props.tokens.length === props.collection.tokenCount &&
+    props.tokens.every((token) => token.created),
+)
 const fullSetsRemaining = computed(() => {
-  if (props.tokens.length < props.collection.tokenCount) {
+  if (!allTokensCreated.value) {
     return null
   }
 
@@ -202,12 +207,12 @@ const fullSetLabel = computed(() => {
     return 'Indexing collection'
   }
 
-  if (mintStatus.value === 'closed') {
-    return 'Minting closed'
+  if (!allTokensCreated.value) {
+    return 'Tokens not created yet'
   }
 
-  if (props.tokens.length < props.collection.tokenCount) {
-    return 'Indexing full set'
+  if (mintStatus.value === 'closed') {
+    return 'Minting closed'
   }
 
   if (fullSetsRemaining.value === 0n) {
@@ -218,6 +223,7 @@ const fullSetLabel = computed(() => {
 })
 
 function tokenActionLabel(token: BitsTokenSummary) {
+  if (!token.created) return 'Not created yet'
   if (token.soldOut) return 'Sold out'
   if (mintStatus.value === 'indexing') return 'Indexing'
   if (!collectionMintable.value) return 'Unavailable'
@@ -271,7 +277,7 @@ function mintCollection() {
 }
 
 function mintToken(token: BitsTokenSummary) {
-  if (token.soldOut) return
+  if (!token.created || token.soldOut) return
   requestMint({ type: 'token', token })
 }
 
