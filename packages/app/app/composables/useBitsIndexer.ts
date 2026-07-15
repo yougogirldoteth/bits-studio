@@ -1,5 +1,6 @@
 import type {
   BitsActivityResponse,
+  BitsCollectionArtworkResponse,
   BitsCollectionResponse,
   BitsCollectionsResponse,
   BitsHoldersResponse,
@@ -70,6 +71,10 @@ export function useBitsIndexer() {
     getCollection: (slug: string) =>
       getJson<BitsCollectionResponse>(
         `/collections/${encodeURIComponent(slug)}`,
+      ),
+    getArtwork: (slug: string) =>
+      getJson<BitsCollectionArtworkResponse>(
+        `/collections/${encodeURIComponent(slug)}/artwork`,
       ),
     listTokens: (slug: string) =>
       getJson<BitsTokensResponse>(

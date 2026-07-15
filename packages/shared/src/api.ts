@@ -2,6 +2,7 @@ import type {
   BitsActivityItem,
   BitsCollectionSummary,
   BitsHolderSummary,
+  BitsTokenArtwork,
   BitsTokenSummary,
 } from './types.ts'
 
@@ -16,6 +17,10 @@ export type BitsCollectionResponse = {
 
 export type BitsTokensResponse = {
   items: BitsTokenSummary[]
+}
+
+export type BitsCollectionArtworkResponse = {
+  items: BitsTokenArtwork[]
 }
 
 export type BitsTokenResponse = {

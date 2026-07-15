@@ -1,4 +1,4 @@
-import type { BitsCollectionResponse } from '@bits-collection/shared'
+import type { BitsCollectionArtworkResponse } from '@bits-collection/shared'
 import type { H3Event } from 'h3'
 import { renderCollectionOgGrid } from '~~/server/utils/collectionOgGrid'
 
@@ -13,8 +13,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const collection = await fetchCollectionForOg(event, slug)
-  const body = await renderCollectionOgGrid(collection)
+  const artwork = await fetchCollectionArtworkForOg(event, slug)
+  const body = await renderCollectionOgGrid(artwork.items)
   if (!body) {
     throw createError({
       statusCode: 404,
@@ -27,19 +27,19 @@ export default defineEventHandler(async (event) => {
   return body
 })
 
-async function fetchCollectionForOg(event: H3Event, slug: string) {
+async function fetchCollectionArtworkForOg(event: H3Event, slug: string) {
   const config = useRuntimeConfig(event)
   const base = String(config.public.bits.indexerUrl).replace(/\/+$/, '')
   const response = await fetch(
-    `${base}/collections/${encodeURIComponent(slug)}`,
+    `${base}/collections/${encodeURIComponent(slug)}/artwork`,
   )
 
   if (!response.ok) {
     throw createError({
       statusCode: response.status,
-      statusMessage: `Indexer collection ${slug} returned ${response.status}`,
+      statusMessage: `Indexer artwork ${slug} returned ${response.status}`,
     })
   }
 
-  return (await response.json()) as BitsCollectionResponse
+  return (await response.json()) as BitsCollectionArtworkResponse
 }

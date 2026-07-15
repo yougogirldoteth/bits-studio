@@ -80,6 +80,11 @@ export type BitsTokenSummary = BitsTokenMetadata & {
   soldOut: boolean
 }
 
+export type BitsTokenArtwork = Pick<
+  BitsTokenMetadata,
+  'tokenId' | 'name' | 'svg'
+>
+
 export type BitsHolderSummary = {
   owner: Address
   ensName?: string

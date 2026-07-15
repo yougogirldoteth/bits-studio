@@ -19,6 +19,7 @@ import {
   type BitsActivityItem,
   type BitsCollectionConfig,
   type BitsHolderSummary,
+  type BitsTokenArtwork,
   type BitsTokenSummary,
 } from '@bits-collection/shared'
 import { resolveOnchainArtist } from '../artist.ts'
@@ -175,6 +176,18 @@ async function listTokenRows(slug: string) {
     .orderBy(asc(bitsToken.token_id))
 }
 
+async function listTokenArtwork(slug: string): Promise<BitsTokenArtwork[]> {
+  return db
+    .select({
+      tokenId: bitsToken.token_id,
+      name: bitsToken.name,
+      svg: bitsToken.svg,
+    })
+    .from(bitsToken)
+    .where(eq(bitsToken.collection_slug, slug))
+    .orderBy(asc(bitsToken.token_id))
+}
+
 app.get('/collections', async (c) => {
   noStore(c)
   const rows = await db.select().from(bitsCollection)
@@ -211,6 +224,14 @@ app.get('/collections/:slug/tokens', async (c) => {
   if (!config) return c.json({ error: 'Unknown collection' }, 404)
 
   return c.json({ items: (await listTokenRows(config.slug)).map(tokenSummary) })
+})
+
+app.get('/collections/:slug/artwork', async (c) => {
+  noStore(c)
+  const config = getBitsCollection(c.req.param('slug'))
+  if (!config) return c.json({ error: 'Unknown collection' }, 404)
+
+  return c.json({ items: await listTokenArtwork(config.slug) })
 })
 
 app.get('/collections/:slug/tokens/:tokenId', async (c) => {

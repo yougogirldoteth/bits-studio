@@ -1,7 +1,4 @@
-import {
-  imageSrcFromSvg,
-  type BitsCollectionResponse,
-} from '@bits-collection/shared'
+import { imageSrcFromSvg, type BitsTokenArtwork } from '@bits-collection/shared'
 import { grid, type Img } from '@visualizevalue/img-grid'
 import sharp from 'sharp'
 
@@ -15,10 +12,10 @@ const BLANK_IMAGE =
   'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/%3E'
 
 export async function renderCollectionOgGrid(
-  collection: BitsCollectionResponse,
+  artwork: readonly BitsTokenArtwork[],
 ) {
   const images: Img[] = []
-  for (const token of collection.tokens) {
+  for (const token of artwork) {
     const url = imageSrcFromSvg(token.svg)
     if (url) {
       images.push({
