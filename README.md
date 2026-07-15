@@ -52,6 +52,7 @@ The frontend reads collection data from stable REST routes:
 
 - `/collections`
 - `/collections/:slug`
+- `/collections/:slug/artwork`
 - `/collections/:slug/tokens`
 - `/collections/:slug/tokens/:tokenId`
 - `/collections/:slug/holders`

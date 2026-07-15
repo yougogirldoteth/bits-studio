@@ -1,7 +1,8 @@
 # Contract Interfaces
 
-This framework targets BITS-style collections: one ERC-1155 mint contract and
-one renderer contract per collection.
+This framework targets BITS-style collections: one ERC-1155 mint contract may
+host multiple configured collections, and each collection points to a renderer
+contract implementing a supported adapter.
 
 ## BITS ERC-1155 Contract
 
@@ -27,6 +28,8 @@ Required events:
 - `OwnershipTransferred`
 
 The indexer treats mints as ERC-1155 transfers from the zero address.
+Events from a shared contract are assigned by contract address and configured
+token range. Token ranges must not overlap.
 
 ## Renderer Adapter
 

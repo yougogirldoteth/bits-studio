@@ -4,6 +4,11 @@ Collections live in `packages/shared/src/collections.ts`. The app and indexer
 both read from the same config, so adding a compatible collection should not
 require route, component, or indexer handler changes.
 
+Multiple collections may share one BITS ERC-1155 contract. Each collection
+still needs its own collection id, non-overlapping token range, renderer
+address, and creation block. The indexer registers the shared contract once and
+routes token events to the matching configured range.
+
 ## Example
 
 ```ts
@@ -27,6 +32,7 @@ require route, component, or indexer handler changes.
   launchLabel: 'Minting is live on Ethereum mainnet.',
   mintLabel: 'Mint',
   explorerBaseUrl: 'https://evm.now',
+  primary: true,
   theme: { accent: '#111111' },
 }
 ```
@@ -34,11 +40,23 @@ require route, component, or indexer handler changes.
 ## Checklist
 
 - The slug is lowercase kebab-case and unique.
+- Exactly one configured collection has `primary: true`; `/` renders it.
 - The BITS and renderer addresses are valid Ethereum addresses.
-- `tokenStartBlock` is the BITS contract deployment block.
+- `tokenStartBlock` is the block that created or initialized this collection.
 - `rendererStartBlock` is the renderer contract deployment block.
-- `collectionId`, `startTokenId`, and `tokenCount` match the contract.
+- A shared BITS contract never reuses a `collectionId` or overlaps token ranges.
+- `collectionId`, `startTokenId`, and `tokenCount` match the onchain collection.
 - `editionSize` and `pricePerTokenWei` match the mint contract.
-- The renderer supports the selected adapter.
+- The configured renderer address matches the onchain collection and supports
+  the selected adapter.
+- Do not add a placeholder before the collection exists: the bootstrap check
+  intentionally fails when configured values differ from onchain state.
 - `pnpm --dir packages/shared test` passes.
+- `pnpm --dir packages/indexer test` passes.
 - `pnpm --dir packages/indexer codegen` succeeds with an RPC configured.
+- `pnpm typecheck` and `pnpm build:app` pass.
+
+After the indexer processes `tokenStartBlock`, verify that `/collections`
+includes the new summary, `/collections/:slug/artwork` contains SVG previews,
+and `/collections/:slug` contains every configured token before enabling public
+mint links.
