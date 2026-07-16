@@ -78,7 +78,7 @@
         </div>
       </section>
 
-      <section class="bits-section">
+      <section v-if="holderTotal > 0" class="bits-section">
         <HoldersTable :holders="holders" :total="holderTotal" />
       </section>
 
