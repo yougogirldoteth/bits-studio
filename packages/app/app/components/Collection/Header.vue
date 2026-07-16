@@ -80,4 +80,23 @@ defineExpose({ openConnect })
   justify-content: flex-end;
   gap: var(--spacer-sm);
 }
+
+@media (max-width: 520px) {
+  .bits-topbar {
+    align-items: start;
+    gap: var(--bits-stack-gap);
+  }
+
+  .bits-wallet {
+    align-self: start;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bits-wallet > .bits-button,
+  .bits-wallet :deep(.bits-connect-wrap),
+  .bits-wallet :deep(.bits-connect) {
+    inline-size: 100%;
+  }
+}
 </style>

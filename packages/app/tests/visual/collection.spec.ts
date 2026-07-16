@@ -90,6 +90,23 @@ test('mobile collection route keeps controls visible', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/collections/drums-collection-1')
 
+  const collectionsLink = page.getByRole('link', {
+    name: 'Collections',
+    exact: true,
+  })
+  const connectButton = page.getByRole('button', {
+    name: 'Connect',
+    exact: true,
+  })
+  const collectionsBox = await collectionsLink.boundingBox()
+  const connectBox = await connectButton.boundingBox()
+
+  expect(collectionsBox).not.toBeNull()
+  expect(connectBox).not.toBeNull()
+  expect(collectionsBox!.y + collectionsBox!.height).toBeLessThanOrEqual(
+    connectBox!.y,
+  )
+
   const mintFullSet = page.getByRole('button', {
     name: /Full sets sold out/i,
   })
