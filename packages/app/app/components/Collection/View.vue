@@ -82,6 +82,25 @@
         <HoldersTable :holders="holders" :total="holderTotal" />
       </section>
 
+      <section
+        v-if="mintCountdownActive"
+        class="bits-section bits-mint-countdown"
+        aria-live="polite"
+      >
+        <div>
+          <div class="bits-mint-countdown__label">
+            Collection 2 mint opens at {{ localMintStartTimeLabel }}
+          </div>
+          <div class="bits-meta">{{ localMintStartDateLabel }}</div>
+        </div>
+        <time
+          class="bits-mint-countdown__time"
+          :datetime="COLLECTION_2_MINT_START_ISO"
+        >
+          {{ mintCountdownLabel }}
+        </time>
+      </section>
+
       <section class="bits-section bits-mode-row">
         <button
           class="bits-button bits-button--primary bits-button--mint-set"
@@ -148,6 +167,10 @@ import CollectionHeader from '~/components/Collection/Header.vue'
 import CollectionTokenCard from '~/components/Collection/TokenCard.vue'
 import HoldersTable from '~/components/HoldersTable.vue'
 
+const COLLECTION_2_SLUG = 'drums-collection-2'
+const COLLECTION_2_MINT_START_ISO = '2026-07-16T21:00:00+02:00'
+const COLLECTION_2_MINT_START = Date.parse(COLLECTION_2_MINT_START_ISO)
+
 const props = defineProps<{
   collection: BitsCollectionSummary
   tokens: BitsTokenSummary[]
@@ -167,9 +190,43 @@ type PendingMintIntent =
 const mode = ref<'thumbnail' | 'html'>('thumbnail')
 const collectionHeader = ref<{ openConnect: () => void } | null>(null)
 const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
+const now = useState('collection-2-mint-countdown-now', () => Date.now())
+const browserTimeZone = ref('')
+let countdownInterval: ReturnType<typeof setInterval> | undefined
+
+const mintCountdownActive = computed(
+  () =>
+    props.collection.slug === COLLECTION_2_SLUG &&
+    now.value < COLLECTION_2_MINT_START,
+)
+const mintCountdownLabel = computed(() =>
+  formatCountdown(COLLECTION_2_MINT_START - now.value),
+)
+const localMintStartTimeLabel = computed(() => {
+  if (!browserTimeZone.value) return 'your local time'
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: browserTimeZone.value,
+  }).format(COLLECTION_2_MINT_START)
+})
+const localMintStartDateLabel = computed(() => {
+  if (!browserTimeZone.value) {
+    return 'Shown in your browser’s time zone'
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: browserTimeZone.value,
+  }).format(COLLECTION_2_MINT_START)
+})
 const mintStatus = computed(() => collectionMintStatus(props.collection))
-const collectionMintable = computed(() =>
-  isCollectionMintable(props.collection),
+const collectionMintable = computed(
+  () => isCollectionMintable(props.collection) && !mintCountdownActive.value,
 )
 const collectionSoldOut = computed(
   () => BigInt(props.collection.minted) >= BigInt(props.collection.totalSupply),
@@ -211,6 +268,10 @@ const fullSetLabel = computed(() => {
     return 'Tokens not created yet'
   }
 
+  if (mintCountdownActive.value) {
+    return `Mint opens in ${mintCountdownLabel.value}`
+  }
+
   if (mintStatus.value === 'closed') {
     return 'Minting closed'
   }
@@ -225,6 +286,7 @@ const fullSetLabel = computed(() => {
 function tokenActionLabel(token: BitsTokenSummary) {
   if (!token.created) return 'Not created yet'
   if (token.soldOut) return 'Sold out'
+  if (mintCountdownActive.value) return mintCountdownLabel.value
   if (mintStatus.value === 'indexing') return 'Indexing'
   if (!collectionMintable.value) return 'Unavailable'
   return 'Mint'
@@ -251,6 +313,28 @@ watch(
     }
   },
 )
+
+onMounted(() => {
+  now.value = Date.now()
+  browserTimeZone.value =
+    Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  if (!mintCountdownActive.value) return
+
+  countdownInterval = globalThis.setInterval(() => {
+    now.value = Date.now()
+
+    if (!mintCountdownActive.value && countdownInterval) {
+      globalThis.clearInterval(countdownInterval)
+      countdownInterval = undefined
+    }
+  }, 1_000)
+})
+
+onBeforeUnmount(() => {
+  if (countdownInterval) {
+    globalThis.clearInterval(countdownInterval)
+  }
+})
 
 function emitMintIntent(intent: PendingMintIntent) {
   if (intent.type === 'collection') {
@@ -303,6 +387,17 @@ function formatWholeNumber(value: bigint) {
   }
 
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+function formatCountdown(remainingMs: number) {
+  const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1_000))
+  const hours = Math.floor(remainingSeconds / 3_600)
+  const minutes = Math.floor((remainingSeconds % 3_600) / 60)
+  const seconds = remainingSeconds % 60
+
+  return [hours, minutes, seconds]
+    .map((value) => value.toString().padStart(2, '0'))
+    .join(':')
 }
 </script>
 
@@ -405,6 +500,33 @@ a.bits-description-artist:hover {
   padding-block-end: var(--bits-stack-gap);
 }
 
+.bits-mint-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bits-stack-gap);
+  border: var(--bits-line-ink);
+  padding: var(--bits-card-padding);
+}
+
+.bits-mint-countdown__label {
+  font-size: calc(var(--font-base) * 1.1);
+  font-weight: 500;
+}
+
+.bits-mint-countdown__time {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: clamp(
+    calc(var(--font-base) * 1.5),
+    4vw,
+    calc(var(--font-base) * 2.5)
+  );
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1;
+}
+
 .bits-button--mint-set {
   min-inline-size: calc(var(--font-base) * 8.85);
   white-space: nowrap;
@@ -496,6 +618,11 @@ a.bits-description-artist:hover {
 }
 
 @media (max-width: 520px) {
+  .bits-mint-countdown {
+    align-items: start;
+    flex-direction: column;
+  }
+
   .bits-mode-row {
     display: grid;
     grid-template-columns: 1fr;
