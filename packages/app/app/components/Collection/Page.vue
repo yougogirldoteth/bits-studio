@@ -6,6 +6,7 @@
     :holder-total="holders?.total ?? 0"
     :holders="holders?.items ?? []"
     :tokens="data.tokens"
+    @load-html="loadLiveHtml"
     @mint-collection="startCollectionMint"
     @mint-token="startTokenMint"
   />
@@ -51,7 +52,7 @@ const transactionText = ref(createTransactionText())
 
 const { data, error, refresh } = await useAsyncData(
   () => `collection:${slug.value}`,
-  () => indexer.getCollection(slug.value),
+  () => indexer.getCollection(slug.value, { includeHtml: false }),
   { watch: [slug] },
 )
 
@@ -73,6 +74,11 @@ const pageUrl = computed(() => absoluteUrl(route.path, requestUrl.origin))
 const imageUrl = computed(() =>
   absoluteUrl(collectionOgImagePath(slug.value), requestUrl.origin),
 )
+const imageAlt = computed(() =>
+  collection.value
+    ? `${collection.value.title} artwork grid`
+    : 'BITS collection artwork grid',
+)
 
 useSeoMeta({
   title: () => pageTitle.value,
@@ -84,11 +90,43 @@ useSeoMeta({
   ogImage: () => imageUrl.value,
   ogImageWidth: '1200',
   ogImageHeight: '630',
+  ogImageType: 'image/png',
+  ogImageAlt: () => imageAlt.value,
   twitterCard: 'summary_large_image',
   twitterTitle: () => pageTitle.value,
   twitterDescription: () => pageDescription.value,
   twitterImage: () => imageUrl.value,
+  twitterImageAlt: () => imageAlt.value,
 })
+
+const liveHtmlRequests = new Map<string, Promise<void>>()
+
+function loadLiveHtml() {
+  if (
+    !data.value ||
+    data.value.tokens.every((token) => !token.created || token.html)
+  ) {
+    return
+  }
+
+  const requestedSlug = slug.value
+  if (liveHtmlRequests.has(requestedSlug)) return
+
+  const request = indexer
+    .listTokens(requestedSlug)
+    .then(({ items }) => {
+      if (data.value?.collection.slug !== requestedSlug) return
+      data.value = { ...data.value, tokens: items }
+    })
+    .catch((loadError) => {
+      console.error('Unable to load live token HTML', loadError)
+    })
+    .finally(() => {
+      liveHtmlRequests.delete(requestedSlug)
+    })
+
+  liveHtmlRequests.set(requestedSlug, request)
+}
 
 function startCollectionMint() {
   if (!data.value) return

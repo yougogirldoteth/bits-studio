@@ -101,7 +101,10 @@ async function collectionSummary(
   })
 }
 
-function tokenSummary(row: TokenRow): BitsTokenSummary {
+function tokenSummary(
+  row: TokenRow,
+  options: { includeHtml?: boolean } = {},
+): BitsTokenSummary {
   const available = tokenAvailable(row.minted, row.edition_size)
 
   return {
@@ -120,7 +123,7 @@ function tokenSummary(row: TokenRow): BitsTokenSummary {
     source: row.source,
     processed: row.processed,
     svg: row.svg,
-    html: row.html,
+    html: options.includeHtml === false ? '' : row.html,
     rendererUpdatedAt: row.renderer_updated_at
       ? Number(row.renderer_updated_at)
       : undefined,
@@ -215,6 +218,7 @@ app.get('/collections/:slug', async (c) => {
   const config = getBitsCollection(c.req.param('slug'))
   if (!config) return c.json({ error: 'Unknown collection' }, 404)
 
+  const includeHtml = c.req.query('includeHtml') !== 'false'
   const [collectionRow, tokens] = await Promise.all([
     findCollectionRow(config.slug),
     listTokenRows(config.slug),
@@ -222,7 +226,7 @@ app.get('/collections/:slug', async (c) => {
 
   return c.json({
     collection: await collectionSummary(config, collectionRow),
-    tokens: tokens.map(tokenSummary),
+    tokens: tokens.map((token) => tokenSummary(token, { includeHtml })),
   })
 })
 
@@ -231,7 +235,11 @@ app.get('/collections/:slug/tokens', async (c) => {
   const config = getBitsCollection(c.req.param('slug'))
   if (!config) return c.json({ error: 'Unknown collection' }, 404)
 
-  return c.json({ items: (await listTokenRows(config.slug)).map(tokenSummary) })
+  return c.json({
+    items: (await listTokenRows(config.slug)).map((token) =>
+      tokenSummary(token),
+    ),
+  })
 })
 
 app.get('/collections/:slug/artwork', async (c) => {

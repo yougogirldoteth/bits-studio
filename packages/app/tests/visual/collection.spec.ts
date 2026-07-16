@@ -9,6 +9,25 @@ test('root renders the configured primary collection', async ({ page }) => {
   await expect(page).toHaveURL(/\/$/)
 })
 
+test('collection open graph image supports crawler HEAD requests', async ({
+  request,
+}) => {
+  const response = await request.head('/og/collections/drums-collection-2', {
+    headers: { 'user-agent': 'Twitterbot/1.0' },
+  })
+
+  expect(response.status()).toBe(200)
+  expect(response.headers()['content-type']).toBe('image/png')
+})
+
+test('live token HTML loads on demand', async ({ page }) => {
+  await page.goto('/collections/drums-collection-2')
+
+  await expect(page.locator('.bits-token iframe')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Live HTML' }).click()
+  await expect(page.locator('.bits-token iframe')).toHaveCount(16)
+})
+
 test('collections route renders the collection overview', async ({ page }) => {
   await page.goto('/collections')
 

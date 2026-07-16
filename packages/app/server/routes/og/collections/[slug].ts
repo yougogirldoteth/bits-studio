@@ -5,6 +5,14 @@ import { renderCollectionOgGrid } from '~~/server/utils/collectionOgGrid'
 const CACHE_CONTROL = 'public, max-age=3600, stale-while-revalidate=86400'
 
 export default defineEventHandler(async (event) => {
+  const method = getMethod(event)
+  if (method !== 'GET' && method !== 'HEAD') {
+    throw createError({
+      statusCode: 405,
+      statusMessage: 'Method not allowed',
+    })
+  }
+
   const slug = getRouterParam(event, 'slug')
   if (!slug) {
     throw createError({
@@ -14,8 +22,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const artwork = await fetchCollectionArtworkForOg(event, slug)
-  const body = await renderCollectionOgGrid(artwork.items)
-  if (!body) {
+  if (artwork.items.length === 0) {
     throw createError({
       statusCode: 404,
       statusMessage: 'No collection artwork',
@@ -24,6 +31,16 @@ export default defineEventHandler(async (event) => {
 
   setHeader(event, 'content-type', 'image/png')
   setHeader(event, 'cache-control', CACHE_CONTROL)
+
+  const body = await renderCollectionOgGrid(artwork.items)
+  if (!body) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'No collection artwork',
+    })
+  }
+
+  setHeader(event, 'content-length', body.byteLength)
   return body
 })
 

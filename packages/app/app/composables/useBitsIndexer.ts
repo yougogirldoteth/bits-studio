@@ -68,9 +68,9 @@ export function useBitsIndexer() {
 
   return {
     listCollections: () => getJson<BitsCollectionsResponse>('/collections'),
-    getCollection: (slug: string) =>
+    getCollection: (slug: string, options: { includeHtml?: boolean } = {}) =>
       getJson<BitsCollectionResponse>(
-        `/collections/${encodeURIComponent(slug)}`,
+        `/collections/${encodeURIComponent(slug)}${includeHtmlQuery(options)}`,
       ),
     getArtwork: (slug: string) =>
       getJson<BitsCollectionArtworkResponse>(
@@ -93,4 +93,8 @@ export function useBitsIndexer() {
         `/collections/${encodeURIComponent(slug)}/holders?offset=${offset}&limit=${limit}`,
       ),
   }
+}
+
+function includeHtmlQuery(options: { includeHtml?: boolean }) {
+  return options.includeHtml === false ? '?includeHtml=false' : ''
 }

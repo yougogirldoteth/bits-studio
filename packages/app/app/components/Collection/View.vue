@@ -127,7 +127,7 @@
             class="bits-segment"
             type="button"
             :aria-pressed="mode === 'html'"
-            @click="mode = 'html'"
+            @click="showLiveHtml"
           >
             Live HTML
           </button>
@@ -180,6 +180,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  loadHtml: []
   mintCollection: []
   mintToken: [token: BitsTokenSummary]
 }>()
@@ -193,6 +194,11 @@ const pendingMintIntent = shallowRef<PendingMintIntent | null>(null)
 const now = useState('collection-2-mint-countdown-now', () => Date.now())
 const browserTimeZone = ref('')
 let countdownInterval: ReturnType<typeof setInterval> | undefined
+
+function showLiveHtml() {
+  mode.value = 'html'
+  emit('loadHtml')
+}
 
 const mintCountdownActive = computed(
   () =>
