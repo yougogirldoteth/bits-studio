@@ -7,6 +7,8 @@ import {
   BITS_START_BLOCK,
   INDEXED_COLLECTIONS,
   INDEXED_BITS_CONTRACTS,
+  RENDERER_RECONCILE_BLOCK_NAME,
+  RENDERER_RECONCILE_INTERVAL,
   bootstrapNameForCollection,
 } from './utils/collections.ts'
 
@@ -61,5 +63,12 @@ export default createConfig({
       startBlock: BITS_START_BLOCK,
     },
   },
-  blocks: collectionBootstraps,
+  blocks: {
+    ...collectionBootstraps,
+    [RENDERER_RECONCILE_BLOCK_NAME]: {
+      chain: 'mainnet',
+      startBlock: 'latest',
+      interval: RENDERER_RECONCILE_INTERVAL,
+    },
+  },
 })

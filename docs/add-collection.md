@@ -59,4 +59,6 @@ routes token events to the matching configured range.
 After the indexer processes `tokenStartBlock`, verify that `/collections`
 includes the new summary, `/collections/:slug/artwork` contains SVG previews,
 and `/collections/:slug` contains every configured token before enabling public
-mint links.
+mint links. Empty renderer slots are reconciled from onchain state every 10
+blocks and fill automatically when their renderer data is created; a
+`MetadataUpdate` event only makes that refresh immediate.

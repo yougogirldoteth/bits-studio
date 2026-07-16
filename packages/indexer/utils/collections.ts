@@ -2,11 +2,14 @@ import {
   bitsCollections,
   collectionForToken,
   collectionsForBitsContract,
+  type BitsRendererBitTuple,
   type BitsCollectionConfig,
 } from '@bits-collection/shared'
 
 export const INDEXED_COLLECTIONS = bitsCollections
 export const BITS_CONTRACT_NAME = 'Bits'
+export const RENDERER_RECONCILE_BLOCK_NAME = 'RendererReconciliation'
+export const RENDERER_RECONCILE_INTERVAL = 10
 export const INDEXED_BITS_CONTRACTS = Array.from(
   new Map(
     INDEXED_COLLECTIONS.map((collection) => [
@@ -62,6 +65,25 @@ export function groupTokenItemsByCollection<T extends { tokenId: number }>(
   }
 
   return Array.from(grouped.values())
+}
+
+export function rendererBitMatchesToken(
+  bit: BitsRendererBitTuple,
+  token: {
+    name: string
+    audio_filename: string
+    svg_filename: string
+    source: string
+    processed: number
+  },
+) {
+  return (
+    bit[0] === token.name &&
+    bit[1] === token.audio_filename &&
+    bit[2] === token.svg_filename &&
+    bit[3] === token.source &&
+    Number(bit[4]) === token.processed
+  )
 }
 
 export function assertCollectionStateMatches(

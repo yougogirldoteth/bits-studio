@@ -16,6 +16,7 @@ export const bitsAbi = parseAbi([
 ])
 
 export const bitsRendererV1Abi = parseAbi([
+  'error FileNotFound(string filename)',
   'function bits(uint256 tokenId) view returns (string name, string audioFilename, string svgFilename, string source, uint8 processed)',
   'function bitToBase64(uint256 tokenId) view returns (string)',
   'function bitToBytes(uint256 tokenId) view returns (bytes)',

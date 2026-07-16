@@ -4,6 +4,8 @@ import { bitsCollections } from '@bits-collection/shared'
 import {
   BITS_CONTRACT_NAME,
   INDEXED_BITS_CONTRACTS,
+  RENDERER_RECONCILE_BLOCK_NAME,
+  RENDERER_RECONCILE_INTERVAL,
   assertCollectionStateMatches,
   balanceRowId,
   bootstrapNameForCollection,
@@ -11,6 +13,7 @@ import {
   indexedCollectionForToken,
   indexedCollectionsForContract,
   indexedCollectionsForContractAtBlock,
+  rendererBitMatchesToken,
   tokenRowId,
 } from '../utils/collections.ts'
 
@@ -18,6 +21,8 @@ test('indexes each bits contract once', () => {
   const [collection, secondCollection] = bitsCollections
 
   assert.equal(BITS_CONTRACT_NAME, 'Bits')
+  assert.equal(RENDERER_RECONCILE_BLOCK_NAME, 'RendererReconciliation')
+  assert.equal(RENDERER_RECONCILE_INTERVAL, 10)
   assert.deepEqual(INDEXED_BITS_CONTRACTS, [collection.bitsContract])
   assert.deepEqual(
     indexedCollectionsForContract(collection.bitsContract),
@@ -58,6 +63,37 @@ test('indexes each bits contract once', () => {
       BigInt(bitsCollections[1].tokenStartBlock),
     ),
     bitsCollections,
+  )
+})
+
+test('detects renderer tuples that need reconciliation', () => {
+  const token = {
+    name: '',
+    audio_filename: '',
+    svg_filename: '',
+    source: '',
+    processed: 0,
+  }
+  const emptyBit = ['', '', '', '', 0] as const
+  const liveBit = [
+    'hyperkick',
+    'hyperkick.wav',
+    'hyperkick.svg',
+    'Sub 37',
+    1,
+  ] as const
+
+  assert.equal(rendererBitMatchesToken(emptyBit, token), true)
+  assert.equal(rendererBitMatchesToken(liveBit, token), false)
+  assert.equal(
+    rendererBitMatchesToken(liveBit, {
+      name: 'hyperkick',
+      audio_filename: 'hyperkick.wav',
+      svg_filename: 'hyperkick.svg',
+      source: 'Sub 37',
+      processed: 1,
+    }),
+    true,
   )
 })
 

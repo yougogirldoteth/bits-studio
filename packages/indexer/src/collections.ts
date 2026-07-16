@@ -19,10 +19,17 @@ import {
   bitsCollection,
   bitsToken,
 } from 'ponder:schema'
-import { zeroAddress, type Address, type PublicClient } from 'viem'
+import {
+  BaseError,
+  ContractFunctionRevertedError,
+  zeroAddress,
+  type Address,
+  type PublicClient,
+} from 'viem'
 import {
   BITS_CONTRACT_NAME,
   INDEXED_COLLECTIONS,
+  RENDERER_RECONCILE_BLOCK_NAME,
   assertCollectionStateMatches,
   balanceRowId,
   bootstrapNameForCollection,
@@ -30,6 +37,7 @@ import {
   indexedCollectionForToken,
   indexedCollectionsForContract,
   indexedCollectionsForContractAtBlock,
+  rendererBitMatchesToken,
   tokenRowId,
 } from '../utils/collections.ts'
 import { resolveOnchainArtist } from './artist.ts'
@@ -137,6 +145,7 @@ async function refreshToken(
   collection: BitsCollectionConfig,
   tokenId: number,
   timestamp: bigint,
+  knownRendererBit?: BitsRendererBitTuple,
 ) {
   const adapter = getRendererAdapter(collection.rendererAdapter)
   const [minted, bit] = await Promise.all([
@@ -146,12 +155,9 @@ async function refreshToken(
       functionName: 'tokenMinted',
       args: [BigInt(tokenId)],
     }),
-    context.client.readContract({
-      abi: bitsRendererV1Abi,
-      address: collection.rendererContract,
-      functionName: 'bits',
-      args: [BigInt(tokenId)],
-    }),
+    knownRendererBit
+      ? Promise.resolve(knownRendererBit)
+      : readRendererBit(context, collection, tokenId),
   ])
   const rendererBit = bit as BitsRendererBitTuple
   const [svg, html] = isRendererBitCreated(rendererBit)
@@ -216,6 +222,55 @@ async function refreshToken(
       renderer_updated_at: timestamp,
       updated_at: timestamp,
     })
+}
+
+async function readRendererBit(
+  context: PonderContext,
+  collection: BitsCollectionConfig,
+  tokenId: number,
+) {
+  return (await context.client.readContract({
+    abi: bitsRendererV1Abi,
+    address: collection.rendererContract,
+    functionName: 'bits',
+    args: [BigInt(tokenId)],
+  })) as BitsRendererBitTuple
+}
+
+async function reconcileRendererTokens(
+  context: PonderContext,
+  collection: BitsCollectionConfig,
+  timestamp: bigint,
+) {
+  for (const tokenId of tokenIdsForCollection(collection)) {
+    const id = tokenRowId(collection, tokenId)
+    const [token, rendererBit] = await Promise.all([
+      context.db.find(bitsToken, { id }),
+      readRendererBit(context, collection, tokenId),
+    ])
+
+    if (token && rendererBitMatchesToken(rendererBit, token)) continue
+
+    try {
+      await refreshToken(context, collection, tokenId, timestamp, rendererBit)
+    } catch (error) {
+      if (isPendingRendererFile(error)) continue
+      throw error
+    }
+  }
+}
+
+function isPendingRendererFile(error: unknown) {
+  if (!(error instanceof BaseError)) return false
+
+  const reverted = error.walk(
+    (cause) => cause instanceof ContractFunctionRevertedError,
+  )
+
+  return (
+    reverted instanceof ContractFunctionRevertedError &&
+    reverted.data?.errorName === 'FileNotFound'
+  )
 }
 
 async function refreshBalance(
@@ -373,6 +428,23 @@ for (const collection of INDEXED_COLLECTIONS) {
     },
   )
 }
+
+ponder.on(
+  `${RENDERER_RECONCILE_BLOCK_NAME}:block` as never,
+  async ({
+    event,
+    context,
+  }: {
+    event: { block: { number: bigint; timestamp: bigint } }
+    context: PonderContext
+  }) => {
+    for (const collection of INDEXED_COLLECTIONS) {
+      if (BigInt(collection.tokenStartBlock) > event.block.number) continue
+
+      await reconcileRendererTokens(context, collection, event.block.timestamp)
+    }
+  },
+)
 
 ponder.on(
   `${BITS_CONTRACT_NAME}:TransferBatch` as never,

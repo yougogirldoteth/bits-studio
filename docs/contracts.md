@@ -18,7 +18,7 @@ Required writes:
 - `mintCollectionPublic(uint256,address)` payable
 - `mintBitPublic(uint256,address,uint256)` payable
 
-Required events:
+Observed events:
 
 - `TransferSingle`
 - `TransferBatch`
@@ -29,7 +29,8 @@ Required events:
 
 The indexer treats mints as ERC-1155 transfers from the zero address.
 Events from a shared contract are assigned by contract address and configured
-token range. Token ranges must not overlap.
+token range. Token ranges must not overlap. Metadata events refresh tokens
+immediately, but renderer discovery does not depend on them.
 
 ## Renderer Adapter
 
@@ -45,4 +46,6 @@ Required reads:
 
 The indexer caches the normalized renderer output per token. Future renderer
 shapes should add a new adapter in `packages/shared/src/renderer.ts` rather than
-forking app or indexer logic.
+forking app or indexer logic. A live-only reconciliation block source compares
+renderer tuples with cached tokens every 10 blocks, so newly created renderer
+tokens appear without a separate BITS transaction.
