@@ -9,10 +9,18 @@ test('collections route renders the collection overview', async ({ page }) => {
   const collectionCard = page.getByRole('link', {
     name: /Drums Collection 1/i,
   })
+  const secondCollectionCard = page.getByRole('link', {
+    name: /Drums Collection 2/i,
+  })
   await expect(collectionCard).toBeVisible()
+  await expect(secondCollectionCard).toBeVisible()
   await expect(collectionCard).toHaveAttribute(
     'href',
     '/collections/drums-collection-1',
+  )
+  await expect(secondCollectionCard).toHaveAttribute(
+    'href',
+    '/collections/drums-collection-2',
   )
   await expect(page.getByText('View collection')).toHaveCount(0)
   await expect(
@@ -20,6 +28,27 @@ test('collections route renders the collection overview', async ({ page }) => {
   ).toHaveCount(0)
   await collectionCard.click()
   await expect(page).toHaveURL(/\/collections\/drums-collection-1$/)
+})
+
+test('pending renderer tokens stay visible and disabled', async ({ page }) => {
+  await page.goto('/collections/drums-collection-2')
+
+  await expect(
+    page.getByRole('heading', { name: 'Drums Collection 2', exact: true }),
+  ).toBeVisible()
+  await expect(page.locator('.bits-token')).toHaveCount(16)
+  await expect(page.locator('.bits-token[data-created="false"]')).toHaveCount(
+    15,
+  )
+  await expect(
+    page.getByRole('button', { name: 'Not created yet', exact: true }),
+  ).toHaveCount(15)
+  await expect(
+    page.getByRole('button', { name: 'Not created yet', exact: true }).first(),
+  ).toBeDisabled()
+  await expect(
+    page.getByRole('button', { name: 'Tokens not created yet', exact: true }),
+  ).toBeDisabled()
 })
 
 test('collections route supports the light theme', async ({ page }) => {

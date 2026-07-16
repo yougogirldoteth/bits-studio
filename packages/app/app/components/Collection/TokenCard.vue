@@ -20,10 +20,11 @@
         <span
           v-if="!token.created"
           aria-hidden="true"
-          class="bits-token__empty-mark"
-        />
-        <span>Token {{ token.tokenId }}</span>
-        <span v-if="!token.created">Not created yet</span>
+          class="bits-token__empty-number"
+        >
+          {{ token.tokenId }}
+        </span>
+        <span v-else>Token {{ token.tokenId }}</span>
       </div>
     </div>
 
@@ -99,6 +100,10 @@ const htmlSrc = computed(() => htmlSrcdoc(props.token.html))
   color: var(--bits-muted);
 }
 
+.bits-token[data-created='false'] .bits-token__media {
+  background: var(--bits-soft);
+}
+
 .bits-token__media {
   position: relative;
   display: grid;
@@ -145,23 +150,10 @@ const htmlSrc = computed(() => htmlSrcdoc(props.token.html))
   text-align: center;
 }
 
-.bits-token__empty-mark {
-  inline-size: calc(var(--font-base) * 2.5);
-  aspect-ratio: 1;
-  border: var(--bits-line-strong);
-  background:
-    linear-gradient(
-      45deg,
-      transparent calc(50% - var(--border-width)),
-      var(--bits-rule-strong) 50%,
-      transparent calc(50% + var(--border-width))
-    ),
-    linear-gradient(
-      -45deg,
-      transparent calc(50% - var(--border-width)),
-      var(--bits-rule-strong) 50%,
-      transparent calc(50% + var(--border-width))
-    );
+.bits-token__empty-number {
+  color: var(--bits-rule-strong);
+  font-size: calc(var(--font-base) * 1.5);
+  line-height: 1;
 }
 
 .bits-token__body {

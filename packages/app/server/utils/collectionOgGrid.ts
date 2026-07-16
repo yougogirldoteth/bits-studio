@@ -13,8 +13,6 @@ const BLANK_IMAGE =
 const EMPTY_TOKEN_IMAGE = `data:image/svg+xml,${encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
     <rect width="600" height="600" fill="#10100f"/>
-    <path d="M0 0 600 600M600 0 0 600" stroke="#343431" stroke-width="2"/>
-    <rect x="249" y="249" width="102" height="102" fill="none" stroke="#5b5a55" stroke-width="2"/>
   </svg>
 `)}`
 
