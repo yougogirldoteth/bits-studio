@@ -285,7 +285,7 @@ jobs:
         run: |
           set -euo pipefail
           curl --fail --silent --show-error --max-time 30 "https://${APP_HOST}/" --output /dev/null
-          curl --fail --silent --show-error --max-time 30 "https://${APP_HOST}/og/collections/drums-collection-1" --output /dev/null
+          curl --fail --silent --show-error --max-time 30 "https://${APP_HOST}/og/collections/drums-collection-2" --output /dev/null
 
           image="$(
             ssh "${DEPLOY_USER}@${DEPLOY_HOST}" \

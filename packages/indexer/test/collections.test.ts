@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {
-  bitsCollections,
-  getPrimaryBitsCollection,
-} from '@bits-collection/shared'
+import { bitsCollections } from '@bits-collection/shared'
 import {
   BITS_CONTRACT_NAME,
   INDEXED_BITS_CONTRACTS,
@@ -18,7 +15,7 @@ import {
 } from '../utils/collections.ts'
 
 test('indexes each bits contract once', () => {
-  const collection = getPrimaryBitsCollection()
+  const [collection, secondCollection] = bitsCollections
 
   assert.equal(BITS_CONTRACT_NAME, 'Bits')
   assert.deepEqual(INDEXED_BITS_CONTRACTS, [collection.bitsContract])
@@ -29,6 +26,10 @@ test('indexes each bits contract once', () => {
   assert.equal(
     bootstrapNameForCollection(collection),
     'Bootstrap_drums_collection_1',
+  )
+  assert.equal(
+    bootstrapNameForCollection(secondCollection),
+    'Bootstrap_drums_collection_2',
   )
   assert.deepEqual(
     indexedCollectionsForContractAtBlock(
@@ -86,7 +87,7 @@ test('routes configured token ids and ignores unknown ids', () => {
 })
 
 test('derives stable token and balance row ids', () => {
-  const collection = getPrimaryBitsCollection()
+  const [collection] = bitsCollections
   const owner = '0xCB7504C4cb986E80AB4983b44263381F21273482'
 
   assert.equal(tokenRowId(collection, 7), 'drums-collection-1:7')
@@ -97,7 +98,7 @@ test('derives stable token and balance row ids', () => {
 })
 
 test('rejects collection state that differs from configuration', () => {
-  const collection = getPrimaryBitsCollection()
+  const [collection] = bitsCollections
   const state = {
     startTokenId: collection.startTokenId,
     tokenCount: collection.tokenCount,

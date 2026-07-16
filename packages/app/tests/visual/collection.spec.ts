@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test'
 
+test('root renders the configured primary collection', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(
+    page.getByRole('heading', { name: 'Drums Collection 2', exact: true }),
+  ).toBeVisible()
+  await expect(page).toHaveURL(/\/$/)
+})
+
 test('collections route renders the collection overview', async ({ page }) => {
   await page.goto('/collections')
 

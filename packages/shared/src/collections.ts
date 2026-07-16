@@ -23,7 +23,7 @@ export const bitsCollections = [
     launchLabel: 'Minting is live on Ethereum mainnet.',
     mintLabel: 'Mint',
     explorerBaseUrl: 'https://evm.now',
-    primary: true,
+    primary: false,
     theme: {
       accent: '#111111',
     },
@@ -49,7 +49,7 @@ export const bitsCollections = [
     launchLabel: 'Minting opens when every instrument is onchain.',
     mintLabel: 'Mint',
     explorerBaseUrl: 'https://evm.now',
-    primary: false,
+    primary: true,
     theme: {
       accent: '#111111',
     },

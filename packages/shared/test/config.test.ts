@@ -25,10 +25,10 @@ test('configured collections validate', () => {
 test('primary collection exposes the configured token range', () => {
   const collection = getPrimaryBitsCollection()
 
-  assert.equal(collection.slug, 'drums-collection-1')
+  assert.equal(collection.slug, 'drums-collection-2')
   assert.deepEqual(
     tokenIdsForCollection(collection),
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
   )
 })
 
@@ -53,7 +53,7 @@ test('second collection exposes its verified onchain configuration', () => {
 test('supply and price helpers use bigint math', () => {
   const collection = getPrimaryBitsCollection()
 
-  assert.equal(collectionTotalSupply(collection), 672n)
+  assert.equal(collectionTotalSupply(collection), 1104n)
   assert.equal(collectionMintPrice(collection), 16_000_000_000_000_000n)
   assert.equal(formatWeiLabel(collection.pricePerTokenWei), '0.001 ETH')
 })
@@ -118,7 +118,7 @@ test('duplicate collection slugs fail loudly', () => {
 })
 
 test('same-contract collections resolve by token range', () => {
-  const [primary] = bitsCollections
+  const primary = standalonePrimary()
   const second = {
     ...primary,
     slug: 'drums-collection-2',
@@ -149,7 +149,7 @@ test('same-contract collections resolve by token range', () => {
 })
 
 test('duplicate contract collection ids fail loudly', () => {
-  const [primary] = bitsCollections
+  const primary = standalonePrimary()
 
   assert.throws(
     () =>
@@ -167,7 +167,7 @@ test('duplicate contract collection ids fail loudly', () => {
 })
 
 test('overlapping same-contract token ranges fail loudly', () => {
-  const [primary] = bitsCollections
+  const primary = standalonePrimary()
 
   assert.throws(
     () =>
@@ -186,7 +186,7 @@ test('overlapping same-contract token ranges fail loudly', () => {
 })
 
 test('collections require exactly one primary', () => {
-  const [primary] = bitsCollections
+  const primary = standalonePrimary()
 
   assert.throws(
     () => validateBitsCollections([{ ...primary, primary: false }]),
@@ -208,7 +208,7 @@ test('collections require exactly one primary', () => {
 })
 
 test('missing start blocks fail loudly', () => {
-  const [collection] = bitsCollections
+  const collection = getPrimaryBitsCollection()
 
   assert.throws(
     () =>
@@ -221,3 +221,7 @@ test('missing start blocks fail loudly', () => {
     /missing start blocks/,
   )
 })
+
+function standalonePrimary() {
+  return { ...bitsCollections[0], primary: true } as const
+}
