@@ -39,25 +39,23 @@ test('collections route renders the collection overview', async ({ page }) => {
   await expect(page).toHaveURL(/\/collections\/drums-collection-1$/)
 })
 
-test('pending renderer tokens stay visible and disabled', async ({ page }) => {
+test('inactive collection tokens stay visible and disabled', async ({
+  page,
+}) => {
   await page.goto('/collections/drums-collection-2')
 
   await expect(
     page.getByRole('heading', { name: 'Drums Collection 2', exact: true }),
   ).toBeVisible()
   await expect(page.locator('.bits-token')).toHaveCount(16)
-  await expect(page.locator('.bits-token[data-created="false"]')).toHaveCount(
-    15,
-  )
-  await expect(
-    page.getByRole('button', { name: 'Not created yet', exact: true }),
-  ).toHaveCount(15)
-  await expect(
-    page.getByRole('button', { name: 'Not created yet', exact: true }).first(),
-  ).toBeDisabled()
-  await expect(
-    page.getByRole('button', { name: 'Tokens not created yet', exact: true }),
-  ).toBeDisabled()
+  const tokenButtons = page.locator('.bits-token__footer .bits-button')
+  await expect(tokenButtons).toHaveCount(16)
+
+  for (const button of await tokenButtons.all()) {
+    await expect(button).toBeDisabled()
+  }
+
+  await expect(page.locator('.bits-button--mint-set')).toBeDisabled()
 })
 
 test('collections route supports the light theme', async ({ page }) => {
