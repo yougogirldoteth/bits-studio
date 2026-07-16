@@ -83,12 +83,10 @@ defineExpose({ openConnect })
 
 @media (max-width: 520px) {
   .bits-topbar {
-    align-items: start;
     gap: var(--bits-stack-gap);
   }
 
   .bits-wallet {
-    align-self: start;
     display: grid;
     grid-template-columns: 1fr;
   }

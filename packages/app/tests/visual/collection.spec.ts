@@ -100,12 +100,23 @@ test('mobile collection route keeps controls visible', async ({ page }) => {
   })
   const collectionsBox = await collectionsLink.boundingBox()
   const connectBox = await connectButton.boundingBox()
+  const brandBox = await page.locator('.bits-brand').boundingBox()
+  const walletBox = await page.locator('.bits-wallet').boundingBox()
 
   expect(collectionsBox).not.toBeNull()
   expect(connectBox).not.toBeNull()
+  expect(brandBox).not.toBeNull()
+  expect(walletBox).not.toBeNull()
   expect(collectionsBox!.y + collectionsBox!.height).toBeLessThanOrEqual(
     connectBox!.y,
   )
+  expect(
+    Math.abs(
+      brandBox!.y +
+        brandBox!.height / 2 -
+        (walletBox!.y + walletBox!.height / 2),
+    ),
+  ).toBeLessThan(1)
 
   const mintFullSet = page.getByRole('button', {
     name: /Full sets sold out/i,
