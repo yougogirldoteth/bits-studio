@@ -441,6 +441,7 @@ ponder.on(
     for (const collection of INDEXED_COLLECTIONS) {
       if (BigInt(collection.tokenStartBlock) > event.block.number) continue
 
+      await ensureCollection(context, collection, event.block.timestamp)
       await reconcileRendererTokens(context, collection, event.block.timestamp)
     }
   },
