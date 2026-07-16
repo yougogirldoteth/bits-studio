@@ -23,6 +23,7 @@
     ref="transactionFlow"
     chain="mainnet"
     :text="transactionText"
+    @cancel="clearPendingMintRefresh"
     @complete="onTransactionComplete"
   />
 </template>
@@ -49,8 +50,9 @@ const transactionFlow = ref<{
   start: (request: () => Promise<`0x${string}`>) => unknown
 } | null>(null)
 const transactionText = ref(createTransactionText())
+const pendingMintedBaseline = ref<bigint | null>(null)
 
-const { data, error, refresh } = await useAsyncData(
+const { data, error } = await useAsyncData(
   () => `collection:${slug.value}`,
   () => indexer.getCollection(slug.value, { includeHtml: false }),
   { watch: [slug] },
@@ -131,6 +133,7 @@ function loadLiveHtml() {
 function startCollectionMint() {
   if (!data.value) return
   const { collection } = data.value
+  pendingMintedBaseline.value = BigInt(collection.minted)
 
   transactionText.value = createTransactionText({
     title: 'Mint full set',
@@ -148,6 +151,7 @@ function startTokenMint(token: BitsTokenSummary) {
   if (!data.value || !token.created) return
   const { collection } = data.value
   const tokenLabel = token.name || `Token ${token.tokenId}`
+  pendingMintedBaseline.value = BigInt(collection.minted)
 
   transactionText.value = createTransactionText({
     title: 'Mint token',
@@ -162,8 +166,44 @@ function startTokenMint(token: BitsTokenSummary) {
 }
 
 async function onTransactionComplete() {
-  await new Promise((resolve) => setTimeout(resolve, 1200))
-  await refresh()
+  const baseline =
+    pendingMintedBaseline.value ?? BigInt(data.value?.collection.minted ?? 0)
+  const requestedSlug = slug.value
+  const includeHtml = data.value?.tokens.some((token) => token.html) ?? false
+
+  pendingMintedBaseline.value = null
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    if (attempt > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+    }
+
+    try {
+      const [collectionResponse, holdersResponse] = await Promise.all([
+        indexer.getCollection(requestedSlug, { includeHtml }),
+        indexer
+          .listHolders(requestedSlug, 0, 100)
+          .catch(() => holders.value),
+      ])
+
+      if (slug.value !== requestedSlug) return
+
+      data.value = collectionResponse
+      if (holdersResponse) {
+        holders.value = holdersResponse
+      }
+
+      if (BigInt(collectionResponse.collection.minted) > baseline) {
+        return
+      }
+    } catch (refreshError) {
+      console.error('Unable to refresh collection after mint', refreshError)
+    }
+  }
+}
+
+function clearPendingMintRefresh() {
+  pendingMintedBaseline.value = null
 }
 
 function createTransactionText(input?: {
