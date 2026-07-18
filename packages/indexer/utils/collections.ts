@@ -91,7 +91,6 @@ export function assertCollectionStateMatches(
   state: {
     startTokenId: number
     tokenCount: number
-    editionSize: bigint
     renderer: string
     pricePerTokenWei: bigint
   },
@@ -106,11 +105,6 @@ export function assertCollectionStateMatches(
   if (state.tokenCount !== collection.tokenCount) {
     mismatches.push(
       `token count ${state.tokenCount} (configured ${collection.tokenCount})`,
-    )
-  }
-  if (state.editionSize !== collection.editionSize) {
-    mismatches.push(
-      `edition size ${state.editionSize} (configured ${collection.editionSize})`,
     )
   }
   if (

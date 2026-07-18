@@ -133,7 +133,7 @@ test('derives stable token and balance row ids', () => {
   )
 })
 
-test('rejects collection state that differs from configuration', () => {
+test('rejects immutable collection state that differs from configuration', () => {
   const [collection] = bitsCollections
   const state = {
     startTokenId: collection.startTokenId,
@@ -142,8 +142,15 @@ test('rejects collection state that differs from configuration', () => {
     renderer: collection.rendererContract,
     pricePerTokenWei: collection.pricePerTokenWei,
   }
+  const changedSupplyState = {
+    ...state,
+    editionSize: collection.editionSize - 1n,
+  }
 
   assert.doesNotThrow(() => assertCollectionStateMatches(collection, state))
+  assert.doesNotThrow(() =>
+    assertCollectionStateMatches(collection, changedSupplyState),
+  )
   assert.throws(
     () =>
       assertCollectionStateMatches(collection, {

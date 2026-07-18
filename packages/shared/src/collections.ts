@@ -44,7 +44,7 @@ export const bitsCollections = [
     tokenStartBlock: 25541411,
     rendererStartBlock: 25541312,
     rendererAdapter: 'bits-renderer-v1',
-    editionSize: 69n,
+    editionSize: 42n,
     pricePerTokenWei: 1_000_000_000_000_000n,
     launchLabel: 'Minting opens when every instrument is onchain.',
     mintLabel: 'Mint',

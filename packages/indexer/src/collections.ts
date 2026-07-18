@@ -126,6 +126,8 @@ async function ensureCollection(
     locked: state.locked,
     updated_at: timestamp,
   })
+
+  return state
 }
 
 async function bootstrapCollection(
@@ -133,10 +135,16 @@ async function bootstrapCollection(
   collection: BitsCollectionConfig,
   timestamp: bigint,
 ) {
-  await ensureCollection(context, collection, timestamp)
+  const state = await ensureCollection(context, collection, timestamp)
 
   for (const tokenId of tokenIdsForCollection(collection)) {
-    await refreshToken(context, collection, tokenId, timestamp)
+    await refreshToken(
+      context,
+      collection,
+      tokenId,
+      state.editionSize,
+      timestamp,
+    )
   }
 }
 
@@ -144,6 +152,7 @@ async function refreshToken(
   context: PonderContext,
   collection: BitsCollectionConfig,
   tokenId: number,
+  editionSize: bigint,
   timestamp: bigint,
   knownRendererBit?: BitsRendererBitTuple,
 ) {
@@ -183,7 +192,7 @@ async function refreshToken(
     html,
     rendererUpdatedAt: Number(timestamp),
   })
-  const available = tokenAvailable(minted, collection.editionSize)
+  const available = tokenAvailable(minted, editionSize)
 
   await context.db
     .insert(bitsToken)
@@ -192,7 +201,7 @@ async function refreshToken(
       collection_slug: collection.slug,
       token_id: tokenId,
       minted,
-      edition_size: collection.editionSize,
+      edition_size: editionSize,
       available,
       name: metadata.name,
       audio_filename: metadata.audioFilename,
@@ -210,7 +219,7 @@ async function refreshToken(
     .update(bitsToken, { id: tokenRowId(collection, tokenId) })
     .set({
       minted,
-      edition_size: collection.editionSize,
+      edition_size: editionSize,
       available,
       name: metadata.name,
       audio_filename: metadata.audioFilename,
@@ -240,6 +249,7 @@ async function readRendererBit(
 async function reconcileRendererTokens(
   context: PonderContext,
   collection: BitsCollectionConfig,
+  editionSize: bigint,
   timestamp: bigint,
 ) {
   for (const tokenId of tokenIdsForCollection(collection)) {
@@ -249,10 +259,26 @@ async function reconcileRendererTokens(
       readRendererBit(context, collection, tokenId),
     ])
 
-    if (token && rendererBitMatchesToken(rendererBit, token)) continue
+    if (token && rendererBitMatchesToken(rendererBit, token)) {
+      if (token.edition_size !== editionSize) {
+        await context.db.update(bitsToken, { id }).set({
+          edition_size: editionSize,
+          available: tokenAvailable(token.minted, editionSize),
+          updated_at: timestamp,
+        })
+      }
+      continue
+    }
 
     try {
-      await refreshToken(context, collection, tokenId, timestamp, rendererBit)
+      await refreshToken(
+        context,
+        collection,
+        tokenId,
+        editionSize,
+        timestamp,
+        rendererBit,
+      )
     } catch (error) {
       if (isPendingRendererFile(error)) continue
       throw error
@@ -356,7 +382,11 @@ async function processTransfers(
 ) {
   const type = from.toLowerCase() === ZERO_ADDRESS ? 'mint' : 'transfer'
 
-  await ensureCollection(context, collection, event.block.timestamp)
+  const state = await ensureCollection(
+    context,
+    collection,
+    event.block.timestamp,
+  )
   await Promise.all(
     items.map((item) =>
       Promise.all([
@@ -369,7 +399,13 @@ async function processTransfers(
           to,
           value: item.value,
         }),
-        refreshToken(context, collection, item.tokenId, event.block.timestamp),
+        refreshToken(
+          context,
+          collection,
+          item.tokenId,
+          state.editionSize,
+          event.block.timestamp,
+        ),
         refreshBalance(
           context,
           collection,
@@ -441,8 +477,17 @@ ponder.on(
     for (const collection of INDEXED_COLLECTIONS) {
       if (BigInt(collection.tokenStartBlock) > event.block.number) continue
 
-      await ensureCollection(context, collection, event.block.timestamp)
-      await reconcileRendererTokens(context, collection, event.block.timestamp)
+      const state = await ensureCollection(
+        context,
+        collection,
+        event.block.timestamp,
+      )
+      await reconcileRendererTokens(
+        context,
+        collection,
+        state.editionSize,
+        event.block.timestamp,
+      )
     }
   },
 )
@@ -495,13 +540,24 @@ ponder.on(
     const tokenId = Number(event.args._tokenId)
     const collection = indexedCollectionForToken(event.log.address, tokenId)
     if (!collection) return
+    const state = await ensureCollection(
+      context,
+      collection,
+      event.block.timestamp,
+    )
 
     await Promise.all([
       recordActivity(context, collection, event, {
         type: 'metadata',
         tokenId,
       }),
-      refreshToken(context, collection, tokenId, event.block.timestamp),
+      refreshToken(
+        context,
+        collection,
+        tokenId,
+        state.editionSize,
+        event.block.timestamp,
+      ),
     ])
   },
 )
@@ -527,14 +583,24 @@ ponder.on(
           ).filter((tokenId) => collectionIncludesTokenId(collection, tokenId))
           if (tokenIds.length === 0) return
 
-          await ensureCollection(context, collection, event.block.timestamp)
+          const state = await ensureCollection(
+            context,
+            collection,
+            event.block.timestamp,
+          )
           await Promise.all([
             recordActivity(context, collection, event, {
               idSuffix: `-${collection.slug}`,
               type: 'metadata',
             }),
             ...tokenIds.map((tokenId) =>
-              refreshToken(context, collection, tokenId, event.block.timestamp),
+              refreshToken(
+                context,
+                collection,
+                tokenId,
+                state.editionSize,
+                event.block.timestamp,
+              ),
             ),
           ])
         },

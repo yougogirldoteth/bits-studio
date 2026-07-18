@@ -43,7 +43,7 @@ test('second collection exposes its verified onchain configuration', () => {
   )
   assert.equal(collection.tokenStartBlock, 25541411)
   assert.equal(collection.rendererStartBlock, 25541312)
-  assert.equal(collection.editionSize, 69n)
+  assert.equal(collection.editionSize, 42n)
   assert.deepEqual(
     tokenIdsForCollection(collection),
     [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
@@ -53,7 +53,7 @@ test('second collection exposes its verified onchain configuration', () => {
 test('supply and price helpers use bigint math', () => {
   const collection = getPrimaryBitsCollection()
 
-  assert.equal(collectionTotalSupply(collection), 1104n)
+  assert.equal(collectionTotalSupply(collection), 672n)
   assert.equal(collectionMintPrice(collection), 16_000_000_000_000_000n)
   assert.equal(formatWeiLabel(collection.pricePerTokenWei), '0.001 ETH')
 })
