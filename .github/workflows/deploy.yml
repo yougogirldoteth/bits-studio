@@ -1,23 +1,13 @@
-name: Deploy
+name: Deploy indexer
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      target:
-        description: Service to deploy
-        required: true
-        default: app
-        type: choice
-        options:
-          - app
-          - indexer
-          - both
 
 concurrency:
-  group: production-deploy
+  group: production-indexer-deploy
   cancel-in-progress: false
 
 permissions:
@@ -25,10 +15,9 @@ permissions:
 
 jobs:
   changes:
-    name: Detect changes
+    name: Detect indexer changes
     runs-on: ubuntu-latest
     outputs:
-      deploy_app: ${{ steps.detect.outputs.deploy_app }}
       deploy_indexer: ${{ steps.detect.outputs.deploy_indexer }}
       reason: ${{ steps.detect.outputs.reason }}
     steps:
@@ -37,42 +26,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect deploy targets
+      - name: Detect deploy target
         id: detect
         shell: bash
         run: |
           set -euo pipefail
 
-          deploy_app=false
           deploy_indexer=false
           reasons=()
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            case "${{ inputs.target }}" in
-              app)
-                deploy_app=true
-                reasons+=("manual:app")
-                ;;
-              indexer)
-                deploy_indexer=true
-                reasons+=("manual:indexer")
-                ;;
-              both)
-                deploy_app=true
-                deploy_indexer=true
-                reasons+=("manual:both")
-                ;;
-              *)
-                echo "Unsupported target: ${{ inputs.target }}" >&2
-                exit 64
-                ;;
-            esac
+            deploy_indexer=true
+            reasons+=("manual:indexer")
           else
             before="${{ github.event.before }}"
             after="${{ github.sha }}"
 
             if [[ -z "$before" || "$before" =~ ^0+$ ]] || ! git cat-file -e "$before^{commit}" 2>/dev/null; then
-              deploy_app=true
               deploy_indexer=true
               reasons+=("push:unknown-base")
             else
@@ -80,58 +50,41 @@ jobs:
 
               for file in "${changed_files[@]}"; do
                 case "$file" in
-                  packages/app/*|Dockerfile.app)
-                    deploy_app=true
-                    reasons+=("app:$file")
-                    ;;
                   packages/indexer/*|Dockerfile.indexer)
                     deploy_indexer=true
                     reasons+=("indexer:$file")
                     ;;
                   packages/shared/*|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|.npmrc|.dockerignore)
-                    deploy_app=true
                     deploy_indexer=true
                     reasons+=("shared:$file")
-                    ;;
-                  .github/workflows/deploy.yml)
-                    deploy_app=true
-                    deploy_indexer=true
-                    reasons+=("workflow:$file")
                     ;;
                 esac
               done
             fi
           fi
 
-          reason="$(IFS=,; echo "${reasons[*]:-no-deployable-changes}")"
+          reason="$(IFS=,; echo "${reasons[*]:-no-indexer-changes}")"
           {
-            echo "deploy_app=$deploy_app"
             echo "deploy_indexer=$deploy_indexer"
             echo "reason=$reason"
           } >> "$GITHUB_OUTPUT"
 
-          echo "Deploy app: $deploy_app"
           echo "Deploy indexer: $deploy_indexer"
           echo "Reason: $reason"
 
   deploy:
-    name: Deploy production
+    name: Deploy production indexer
     runs-on: ubuntu-latest
     needs:
       - changes
-    if: needs.changes.outputs.deploy_app == 'true' || needs.changes.outputs.deploy_indexer == 'true'
+    if: needs.changes.outputs.deploy_indexer == 'true'
     environment: production
     timeout-minutes: 90
     env:
-      DEPLOY_APP: ${{ needs.changes.outputs.deploy_app }}
-      DEPLOY_INDEXER: ${{ needs.changes.outputs.deploy_indexer }}
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
       DEPLOY_USER: ${{ vars.DEPLOY_USER }}
       DOCKER_REGISTRY_USERNAME: ${{ vars.DOCKER_REGISTRY_USERNAME }}
-      APP_HOST: ${{ vars.APP_HOST }}
       INDEXER_HOST: ${{ vars.INDEXER_HOST }}
-      NUXT_PUBLIC_BITS_INDEXER_URL: ${{ vars.NUXT_PUBLIC_BITS_INDEXER_URL }}
-      NUXT_PUBLIC_BITS_INDEXER_CHAIN: ${{ vars.NUXT_PUBLIC_BITS_INDEXER_CHAIN }}
       VVORK_PROJECT: ${{ vars.VVORK_PROJECT }}
       VVORK_REPO: ${{ vars.VVORK_REPO }}
       PONDER_RPC_REQUESTS_PER_SECOND_1: ${{ vars.PONDER_RPC_REQUESTS_PER_SECOND_1 }}
@@ -142,8 +95,6 @@ jobs:
       POSTGRES_DATA: ${{ vars.POSTGRES_DATA }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-      NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS: ${{ secrets.NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS }}
-      NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID: ${{ secrets.NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID }}
       PONDER_RPC_URLS_1: ${{ secrets.PONDER_RPC_URLS_1 }}
       PONDER_RPC_FALLBACK_URLS_1: ${{ secrets.PONDER_RPC_FALLBACK_URLS_1 }}
       PONDER_WS_URL_1: ${{ secrets.PONDER_WS_URL_1 }}
@@ -160,8 +111,6 @@ jobs:
           for name in \
             SSH_PRIVATE_KEY \
             KAMAL_REGISTRY_PASSWORD \
-            NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS \
-            NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID \
             PONDER_RPC_URLS_1 \
             PONDER_RPC_FALLBACK_URLS_1 \
             PONDER_WS_URL_1 \
@@ -190,10 +139,7 @@ jobs:
             DEPLOY_HOST
             DEPLOY_USER
             DOCKER_REGISTRY_USERNAME
-            APP_HOST
             INDEXER_HOST
-            NUXT_PUBLIC_BITS_INDEXER_URL
-            NUXT_PUBLIC_BITS_INDEXER_CHAIN
             VVORK_PROJECT
             VVORK_REPO
             PONDER_RPC_REQUESTS_PER_SECOND_1
@@ -203,8 +149,6 @@ jobs:
             POSTGRES_DATA
             SSH_PRIVATE_KEY
             KAMAL_REGISTRY_PASSWORD
-            NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS
-            NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID
             PONDER_RPC_URLS_1
             DATABASE_URL
             POSTGRES_PASSWORD
@@ -254,50 +198,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Render Kamal configs
-        shell: bash
-        run: |
-          set -euo pipefail
-          (cd packages/indexer && kamal config > "$RUNNER_TEMP/indexer-kamal.yml")
-          (cd packages/app && kamal config > "$RUNNER_TEMP/app-kamal.yml")
+      - name: Render Kamal config
+        working-directory: packages/indexer
+        run: kamal config > "$RUNNER_TEMP/indexer-kamal.yml"
 
       - name: Deploy indexer
-        if: env.DEPLOY_INDEXER == 'true'
         working-directory: packages/indexer
         run: kamal deploy
 
       - name: Verify indexer
-        if: env.DEPLOY_INDEXER == 'true'
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --silent --show-error --max-time 30 "https://${INDEXER_HOST}/ready" --output /dev/null
           curl --fail --silent --show-error --max-time 30 "https://${INDEXER_HOST}/collections" --output /dev/null
-
-      - name: Deploy app
-        if: env.DEPLOY_APP == 'true'
-        working-directory: packages/app
-        run: kamal deploy
-
-      - name: Verify app
-        if: env.DEPLOY_APP == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --max-time 30 "https://${APP_HOST}/" --output /dev/null
-          curl --fail --silent --show-error --max-time 30 "https://${APP_HOST}/og/collections/drums-collection-2" --output /dev/null
-
-          image="$(
-            ssh "${DEPLOY_USER}@${DEPLOY_HOST}" \
-              'docker ps --format "{{.Image}}" --filter label=service=dav-worldcomputer-art --filter label=role=web | head -n 1'
-          )"
-
-          case "$image" in
-            *":${GITHUB_SHA}"|*":${GITHUB_SHA}_"*)
-              echo "Running app image matches ${GITHUB_SHA}"
-              ;;
-            *)
-              echo "Running app image does not match ${GITHUB_SHA}: $image" >&2
-              exit 1
-              ;;
-          esac

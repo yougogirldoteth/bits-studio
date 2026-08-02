@@ -13,7 +13,7 @@ experience without one-off frontend code.
 - A Ponder indexer with REST and GraphQL endpoints.
 - A shared package for collection config, ABI fragments, renderer adapters,
   validation, helpers, and API types.
-- Docker and Kamal deployment setup for app + indexer + Postgres.
+- Docker and Kamal deployment setup for the production indexer and Postgres.
 - MIT license and open-source-safe defaults.
 
 ## Packages
@@ -79,4 +79,5 @@ NFT contracts. See `docs/contracts.md`.
 
 ## Deployment
 
-See `docs/deploy.md`.
+See `docs/deploy.md`. The frontend in this repository is not allowed to claim
+the production `dav.worldcomputer.art` service or domain.

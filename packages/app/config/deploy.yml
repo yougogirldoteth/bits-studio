@@ -20,6 +20,10 @@ app_hosts = [ENV["APP_HOST"].to_s]
   .reject(&:empty?)
   .uniq
 
+if service_name == "dav-worldcomputer-art" || app_hosts.include?("dav.worldcomputer.art")
+  raise "The legacy app may not deploy as dav-worldcomputer-art or claim dav.worldcomputer.art; those are reserved for the production portfolio deployment"
+end
+
 def rpc_list(configured, fallback)
   urls = configured.to_s.split(/\s+/)
   urls = [fallback] if urls.empty?
