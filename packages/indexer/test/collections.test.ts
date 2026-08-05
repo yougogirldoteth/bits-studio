@@ -18,7 +18,7 @@ import {
 } from '../utils/collections.ts'
 
 test('indexes each bits contract once', () => {
-  const [collection, secondCollection] = bitsCollections
+  const [collection, secondCollection, thirdCollection] = bitsCollections
 
   assert.equal(BITS_CONTRACT_NAME, 'Bits')
   assert.equal(RENDERER_RECONCILE_BLOCK_NAME, 'RendererReconciliation')
@@ -35,6 +35,10 @@ test('indexes each bits contract once', () => {
   assert.equal(
     bootstrapNameForCollection(secondCollection),
     'Bootstrap_drums_collection_2',
+  )
+  assert.equal(
+    bootstrapNameForCollection(thirdCollection),
+    'Bootstrap_one_shots_vol_1',
   )
   assert.deepEqual(
     indexedCollectionsForContractAtBlock(
@@ -61,6 +65,20 @@ test('indexes each bits contract once', () => {
     indexedCollectionsForContractAtBlock(
       collection.bitsContract,
       BigInt(bitsCollections[1].tokenStartBlock),
+    ),
+    [collection, secondCollection],
+  )
+  assert.deepEqual(
+    indexedCollectionsForContractAtBlock(
+      collection.bitsContract,
+      BigInt(thirdCollection.tokenStartBlock - 1),
+    ),
+    [collection, secondCollection],
+  )
+  assert.deepEqual(
+    indexedCollectionsForContractAtBlock(
+      collection.bitsContract,
+      BigInt(thirdCollection.tokenStartBlock),
     ),
     bitsCollections,
   )
@@ -98,7 +116,7 @@ test('detects renderer tuples that need reconciliation', () => {
 })
 
 test('routes configured token ids and ignores unknown ids', () => {
-  const [collection, secondCollection] = bitsCollections
+  const [collection, secondCollection, thirdCollection] = bitsCollections
 
   assert.equal(
     indexedCollectionForToken(collection.bitsContract, 1)?.slug,
@@ -108,16 +126,22 @@ test('routes configured token ids and ignores unknown ids', () => {
     indexedCollectionForToken(collection.bitsContract, 17)?.slug,
     secondCollection.slug,
   )
-  assert.equal(indexedCollectionForToken(collection.bitsContract, 33), null)
+  assert.equal(
+    indexedCollectionForToken(collection.bitsContract, 33)?.slug,
+    thirdCollection.slug,
+  )
+  assert.equal(indexedCollectionForToken(collection.bitsContract, 49), null)
   assert.deepEqual(
     groupTokenItemsByCollection(collection.bitsContract, [
       { tokenId: 1, value: 2n },
       { tokenId: 17, value: 1n },
       { tokenId: 33, value: 1n },
+      { tokenId: 49, value: 1n },
     ]),
     [
       { collection, items: [{ tokenId: 1, value: 2n }] },
       { collection: secondCollection, items: [{ tokenId: 17, value: 1n }] },
+      { collection: thirdCollection, items: [{ tokenId: 33, value: 1n }] },
     ],
   )
 })

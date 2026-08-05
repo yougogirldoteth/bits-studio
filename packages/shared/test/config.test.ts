@@ -25,10 +25,10 @@ test('configured collections validate', () => {
 test('primary collection exposes the configured token range', () => {
   const collection = getPrimaryBitsCollection()
 
-  assert.equal(collection.slug, 'drums-collection-2')
+  assert.equal(collection.slug, 'one-shots-vol-1')
   assert.deepEqual(
     tokenIdsForCollection(collection),
-    [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+    [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48],
   )
 })
 
@@ -50,8 +50,30 @@ test('second collection exposes its verified onchain configuration', () => {
   )
 })
 
+test('third collection exposes its verified onchain configuration', () => {
+  const collection = bitsCollections[2]
+
+  assert.equal(collection.slug, 'one-shots-vol-1')
+  assert.equal(collection.title, 'One Shots vol. 1')
+  assert.equal(collection.description, 'Sixteen fully onchain one-shot sounds')
+  assert.equal(collection.collectionId, 3n)
+  assert.equal(
+    collection.rendererContract.toLowerCase(),
+    '0x8c7c981cecf6142c1d84d2952641386cb70b6387',
+  )
+  assert.equal(collection.tokenStartBlock, 25687904)
+  assert.equal(collection.rendererStartBlock, 25687649)
+  assert.equal(collection.editionSize, 42n)
+  assert.equal(collection.pricePerTokenWei, 1n)
+  assert.equal(collection.rendererAdapter, 'bits-renderer-v1')
+  assert.deepEqual(
+    tokenIdsForCollection(collection),
+    [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48],
+  )
+})
+
 test('supply and price helpers use bigint math', () => {
-  const collection = getPrimaryBitsCollection()
+  const collection = bitsCollections[1]
 
   assert.equal(collectionTotalSupply(collection), 672n)
   assert.equal(collectionMintPrice(collection), 16_000_000_000_000_000n)
