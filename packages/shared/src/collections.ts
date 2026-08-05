@@ -70,7 +70,7 @@ export const bitsCollections = [
     rendererStartBlock: 25687649,
     rendererAdapter: 'bits-renderer-v1',
     editionSize: 42n,
-    pricePerTokenWei: 1n,
+    pricePerTokenWei: 1_000_000_000_000_000n,
     launchLabel: 'Minting opens when every instrument is onchain.',
     mintLabel: 'Mint',
     explorerBaseUrl: 'https://evm.now',

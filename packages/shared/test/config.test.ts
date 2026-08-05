@@ -64,7 +64,7 @@ test('third collection exposes its verified onchain configuration', () => {
   assert.equal(collection.tokenStartBlock, 25687904)
   assert.equal(collection.rendererStartBlock, 25687649)
   assert.equal(collection.editionSize, 42n)
-  assert.equal(collection.pricePerTokenWei, 1n)
+  assert.equal(collection.pricePerTokenWei, 1_000_000_000_000_000n)
   assert.equal(collection.rendererAdapter, 'bits-renderer-v1')
   assert.deepEqual(
     tokenIdsForCollection(collection),
