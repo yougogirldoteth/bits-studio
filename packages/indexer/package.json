@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "ponder dev",
-    "start": "ponder start",
+    "start": "node scripts/check-database-role.mjs && ponder start",
     "serve": "ponder serve",
     "db": "ponder db",
     "codegen": "ponder codegen",
@@ -13,7 +13,8 @@
     "test": "tsx --test test/*.test.ts",
     "kamal:setup": "set -a && . ./.env.production && set +a && kamal setup",
     "kamal:deploy": "set -a && . ./.env.production && set +a && kamal deploy",
-    "kamal:sh": "set -a && . ./.env.production && set +a && kamal app exec -i --reuse sh"
+    "kamal:sh": "set -a && . ./.env.production && set +a && kamal app exec -i --reuse sh",
+    "db:check-role": "node scripts/check-database-role.mjs"
   },
   "dependencies": {
     "@bits-collection/shared": "workspace:*",

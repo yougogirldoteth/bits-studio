@@ -18,11 +18,14 @@ RUN pnpm codegen
 
 FROM base AS production
 WORKDIR /app
-COPY --from=build /app /app
+COPY --from=build --chown=node:node /app /app
 WORKDIR /app/packages/indexer
 
 ENV HOST=0.0.0.0
 ENV PORT=42069
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=1536 --max-http-header-size=16384"
+USER node
 EXPOSE 42069
 
-CMD ["sh", "-c", "set -u; schema=${DATABASE_SCHEMA:-bits_indexer_$(printf %s \"${KAMAL_VERSION:-local}\" | sha1sum | cut -c1-16)}; views_schema=${PONDER_VIEWS_SCHEMA:-bits_indexer}; exec pnpm start --schema=\"$schema\" --views-schema=\"$views_schema\""]
+CMD ["sh", "scripts/start-indexer.sh"]

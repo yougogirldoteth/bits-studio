@@ -25,6 +25,11 @@ Required values:
 - `DATABASE_URL`
 - `DATABASE_SCHEMA`
 - `POSTGRES_PASSWORD`
+- `POSTGRES_ADMIN_USER` (`ponder` for the existing cluster; `ponder_admin` for new clusters)
+
+`DATABASE_URL` must use the separate non-superuser `ponder_indexer` login.
+Prepare it before deploying: see [security rollout](indexer-security-rollout.md)
+for the existing-data ownership migration, verification and rollback steps.
 
 Optional values:
 
