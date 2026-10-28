@@ -20,9 +20,9 @@
     "@ponder/utils": "^0.2.18",
     "abitype": "^1.0.0",
     "drizzle-orm": "0.41.0",
-    "hono": "^4.5.0",
+    "hono": "4.13.14",
     "pg": "^8.16.3",
-    "ponder": "^0.16.6",
+    "ponder": "0.16.10",
     "viem": "^2.21.3"
   },
   "devDependencies": {

@@ -54,7 +54,7 @@ jobs:
                     deploy_indexer=true
                     reasons+=("indexer:$file")
                     ;;
-                  packages/shared/*|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|.npmrc|.dockerignore)
+                  packages/shared/*|patches/*|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|.npmrc|.dockerignore)
                     deploy_indexer=true
                     reasons+=("shared:$file")
                     ;;

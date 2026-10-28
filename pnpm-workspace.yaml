@@ -9,3 +9,9 @@ allowBuilds:
   secp256k1: true
   sharp: true
   vue-demi: true
+
+minimumReleaseAgeExclude:
+  - hono@4.13.14
+
+patchedDependencies:
+  ponder@0.16.10: patches/ponder@0.16.10.patch

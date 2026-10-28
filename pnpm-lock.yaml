@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  ponder@0.16.10: 672cf255b1ac6280ce2564291706e55889d68ce7d82742d38ec55918a245ad9a
+
 importers:
   .:
     devDependencies:
@@ -72,14 +75,14 @@ importers:
         specifier: 0.41.0
         version: 0.41.0(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.26.3)(pg@8.22.0)
       hono:
-        specifier: ^4.5.0
-        version: 4.12.28
+        specifier: 4.13.14
+        version: 4.13.14
       pg:
         specifier: ^8.16.3
         version: 8.22.0
       ponder:
-        specifier: ^0.16.6
-        version: 0.16.7(@opentelemetry/api@1.9.1)(@types/node@22.20.0)(@types/pg@8.20.0)(hono@4.12.28)(terser@5.48.0)(typescript@5.8.3)(viem@2.48.4(typescript@5.8.3)(zod@3.25.76))(zod@3.25.76)
+        specifier: 0.16.10
+        version: 0.16.10(patch_hash=672cf255b1ac6280ce2564291706e55889d68ce7d82742d38ec55918a245ad9a)(@opentelemetry/api@1.9.1)(@types/node@22.20.0)(@types/pg@8.20.0)(hono@4.13.14)(terser@5.48.0)(typescript@5.8.3)(viem@2.48.4(typescript@5.8.3)(zod@3.25.76))(zod@3.25.76)
       viem:
         specifier: ^2.21.3
         version: 2.48.4(typescript@5.8.3)(zod@3.25.76)
@@ -6858,10 +6861,10 @@ packages:
         integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==,
       }
 
-  hono@4.12.28:
+  hono@4.13.14:
     resolution:
       {
-        integrity: sha512-YwUvVpSF7m1yOblFPrU3Hbo8XhPheBoiyfGuII6z19LnOr6JpDnyyp7LFNrfV56wS8tpvtBFGRISHN02pDdLOA==,
+        integrity: sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==,
       }
     engines: { node: '>=16.9.0' }
 
@@ -8316,10 +8319,10 @@ packages:
       }
     engines: { node: '>=10.13.0' }
 
-  ponder@0.16.7:
+  ponder@0.16.10:
     resolution:
       {
-        integrity: sha512-hlAKbikX1jCoGuKJoG7hL358Q9qrta55nlqrQebwow8WZoCmZNrH2GXGh5ywME8BToM8Nd1959lzBVf4xh5Wow==,
+        integrity: sha512-fq71xPU7phJ3z2Is6n1X76leHSWuDCKEk1u/vNQmQrX+BmhtkEdWBhArox+2SdvOTwiU0xfplKFwptdUlymH3g==,
       }
     engines: { node: '>=18.14' }
     hasBin: true
@@ -8688,6 +8691,7 @@ packages:
         integrity: sha512-6ZiOBfCywsD4k1BN9IX0uZhF+tJkV8q8llP64G5Hajs4JOeVLPCwpPVcpXy3BwYiUGgyJzsJJQeOIv7+hDSq8g==,
       }
     engines: { node: ^16 || ^18 || >=20 }
+    deprecated: prom-client has been replaced by @prometheus-io/client
 
   prompts@2.4.2:
     resolution:
@@ -11700,9 +11704,9 @@ snapshots:
       '@repeaterjs/repeater': 3.1.0
       tslib: 2.8.1
 
-  '@hono/node-server@1.19.5(hono@4.12.28)':
+  '@hono/node-server@1.19.5(hono@4.13.14)':
     dependencies:
-      hono: 4.12.28
+      hono: 4.13.14
 
   '@iconify-json/lucide@1.2.116':
     dependencies:
@@ -15916,7 +15920,7 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
-  hono@4.12.28: {}
+  hono@4.13.14: {}
 
   hookable@5.5.3: {}
 
@@ -17013,7 +17017,7 @@ snapshots:
 
   pngjs@5.0.0: {}
 
-  ponder@0.16.7(@opentelemetry/api@1.9.1)(@types/node@22.20.0)(@types/pg@8.20.0)(hono@4.12.28)(terser@5.48.0)(typescript@5.8.3)(viem@2.48.4(typescript@5.8.3)(zod@3.25.76))(zod@3.25.76):
+  ponder@0.16.10(patch_hash=672cf255b1ac6280ce2564291706e55889d68ce7d82742d38ec55918a245ad9a)(@opentelemetry/api@1.9.1)(@types/node@22.20.0)(@types/pg@8.20.0)(hono@4.13.14)(terser@5.48.0)(typescript@5.8.3)(viem@2.48.4(typescript@5.8.3)(zod@3.25.76))(zod@3.25.76):
     dependencies:
       '@babel/code-frame': 7.29.7
       '@commander-js/extra-typings': 12.1.0(commander@12.1.0)
@@ -17021,7 +17025,7 @@ snapshots:
       '@escape.tech/graphql-armor-max-aliases': 2.6.2
       '@escape.tech/graphql-armor-max-depth': 2.4.2
       '@escape.tech/graphql-armor-max-tokens': 2.5.1
-      '@hono/node-server': 1.19.5(hono@4.12.28)
+      '@hono/node-server': 1.19.5(hono@4.13.14)
       '@ponder/utils': 0.2.18(typescript@5.8.3)(viem@2.48.4(typescript@5.8.3)(zod@3.25.76))
       abitype: 0.10.3(typescript@5.8.3)(zod@3.25.76)
       ansi-escapes: 7.3.0
@@ -17034,7 +17038,7 @@ snapshots:
       glob: 10.5.0
       graphql: 16.8.2
       graphql-yoga: 5.17.1(graphql@16.8.2)
-      hono: 4.12.28
+      hono: 4.13.14
       http-terminator: 3.2.0
       kysely: 0.26.3
       pg: 8.22.0
