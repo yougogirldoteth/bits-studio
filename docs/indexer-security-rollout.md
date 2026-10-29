@@ -26,6 +26,12 @@ and backup with the host operator. The frontend is deployed from another repo.
   operation, not a process memory cap. The app role allows 70 connections for two
   overlapping Ponder processes (30 each) and operational headroom.
 
+The app joins `dav-worldcomputer-art-data` as well as Kamal's proxy network,
+so indexing retains outbound RPC access. The database joins only the private
+data bridge. Its service hostname, database name and persistent data mount stay
+unchanged. This separates the database from other applications; app containers
+still share Kamal's proxy network.
+
 ## Local checks
 
 From the repository root:
@@ -64,7 +70,20 @@ and process lifecycle; no production requests or RPC are needed.
    changing `POSTGRES_USER` does not change roles in an existing data directory.
    Keep `POSTGRES_PASSWORD` as the administrator secret. It is never passed to
    the app. Fresh clusters instead default to `ponder_admin`.
-5. Load the deployment environment in a private terminal, then stop the app:
+5. Have the host operator create or verify the dedicated internal bridge before
+   restarting services:
+
+   ```sh
+   ssh -o BatchMode=yes -o StrictHostKeyChecking=yes our-server \
+     'docker network inspect dav-worldcomputer-art-data >/dev/null 2>&1 || docker network create --internal --label vvork.project=dav-worldcomputer-art --label vvork.kind=infra --label vvork.owner=personal dav-worldcomputer-art-data'
+   ```
+
+   Confirm `Internal=true` and that only the DAV database and indexing app join
+   this network. Keep the existing DB service name and data mount. In Kamal 2,
+   the accessory's top-level `network` replaces its default proxy network; an
+   `options.network` entry alone would add another network instead.
+
+   Load the deployment environment in a private terminal, then stop the app:
 
    ```sh
    cd packages/indexer

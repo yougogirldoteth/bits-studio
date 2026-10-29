@@ -36,7 +36,7 @@ servers:
     hosts:
       - <%= ENV["DEPLOY_HOST"] %>
     options:
-      network: shared
+      network: dav-worldcomputer-art-data
       memory: 2g
       memory-swap: 2g
       cpus: 2
@@ -94,8 +94,8 @@ accessories:
     service: <%= db_service_name %>
     image: postgres:17.11-alpine
     host: <%= ENV["DEPLOY_HOST"] %>
+    network: dav-worldcomputer-art-data
     options:
-      network: shared
       memory: 4g
       memory-swap: 4g
       cpus: 2
