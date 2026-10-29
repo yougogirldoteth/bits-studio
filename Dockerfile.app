@@ -4,6 +4,7 @@ WORKDIR /app
 
 FROM base AS deps
 COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches patches
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/app/package.json packages/app/package.json
 RUN pnpm install --frozen-lockfile --filter @bits-collection/app...
