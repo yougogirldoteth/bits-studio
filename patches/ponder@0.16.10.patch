@@ -1,6 +1,6 @@
 --- a/src/client/index.ts
 +++ b/src/client/index.ts
-@@ -433,117 +433,142 @@
+@@ -433,117 +433,150 @@
        }
  
        liveQueryCount++;
@@ -127,23 +127,30 @@
 +          .slice(0, 10);
 +
 +        const response = streamSSE(c, async (stream) => {
-+          const aborted = promiseWithResolvers<void>();
++          let wakeOnAbort: (() => void) | undefined;
 +          const abort = () => stream.abort();
 +          stream.onAbort(() => {
 +            releaseLiveQuerySlot();
-+            aborted.resolve();
++            wakeOnAbort?.();
 +          });
 +          c.req.raw.signal.addEventListener("abort", abort, { once: true });
 +          if (c.req.raw.signal.aborted) abort();
 +
 +          try {
 +            while (stream.closed === false && stream.aborted === false) {
-+              await Promise.race([
-+                aborted.promise,
-+                ...Array.from(referencedTables).map(
-+                  (relation) => perTableResolver.get(relation)!.promise,
-+                ),
-+              ]);
++              // A fresh waiter prevents completed races retaining the whole stream.
++              const aborted = promiseWithResolvers<void>();
++              wakeOnAbort = aborted.resolve;
++              try {
++                await Promise.race([
++                  aborted.promise,
++                  ...Array.from(referencedTables).map(
++                    (relation) => perTableResolver.get(relation)!.promise,
++                  ),
++                ]);
++              } finally {
++                wakeOnAbort = undefined;
++              }
 +              if (stream.closed || stream.aborted) break;
 +
 +              try {
@@ -186,6 +193,7 @@
 +              }
 +            }
 +          } finally {
++            wakeOnAbort = undefined;
 +            c.req.raw.signal.removeEventListener("abort", abort);
 +            releaseLiveQuerySlot();
 +          }
@@ -248,7 +256,7 @@
      return next();
 --- a/dist/esm/client/index.js
 +++ b/dist/esm/client/index.js
-@@ -334,106 +334,139 @@
+@@ -334,106 +334,147 @@
                  return c.text("Maximum number of live queries reached", 503);
              }
              liveQueryCount++;
@@ -368,21 +376,28 @@
 +                    .digest("hex")
 +                    .slice(0, 10);
 +                const response = streamSSE(c, async (stream) => {
-+                    const aborted = promiseWithResolvers();
++                    let wakeOnAbort;
 +                    const abort = () => stream.abort();
 +                    stream.onAbort(() => {
 +                        releaseLiveQuerySlot();
-+                        aborted.resolve();
++                        wakeOnAbort?.();
 +                    });
 +                    c.req.raw.signal.addEventListener("abort", abort, { once: true });
 +                    if (c.req.raw.signal.aborted)
 +                        abort();
 +                    try {
 +                        while (stream.closed === false && stream.aborted === false) {
-+                            await Promise.race([
-+                                aborted.promise,
-+                                ...Array.from(referencedTables).map((relation) => perTableResolver.get(relation).promise),
-+                            ]);
++                            // A fresh waiter prevents completed races retaining the whole stream.
++                            const aborted = promiseWithResolvers();
++                            wakeOnAbort = aborted.resolve;
++                            try {
++                              await Promise.race([
++                                  aborted.promise,
++                                  ...Array.from(referencedTables).map((relation) => perTableResolver.get(relation).promise),
++                              ]);
++                            } finally {
++                              wakeOnAbort = undefined;
++                            }
 +                            if (stream.closed || stream.aborted)
 +                                break;
 +                            try {
@@ -425,7 +440,8 @@
 +                        }
 +                    }
 +                    finally {
-+                        c.req.raw.signal.removeEventListener("abort", abort);
++                        wakeOnAbort = undefined;
++                      c.req.raw.signal.removeEventListener("abort", abort);
 +                        releaseLiveQuerySlot();
 +                    }
                  });

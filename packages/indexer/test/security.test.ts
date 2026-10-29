@@ -164,3 +164,40 @@ test('Ponder resolves the patched Hono and default CORS still handles preflight'
   const corsSource = await readFile(require.resolve('hono/cors'), 'utf8')
   assert.doesNotMatch(corsSource, /split\(\/\\s\*,\\s\*\//)
 })
+
+test('repeated live updates retain bounded memory until disconnect', async () => {
+  const gc = global.gc
+  assert.ok(gc, 'Run this suite with --expose-gc')
+  const { app, notify } = await fixture()
+  const responses: Response[] = []
+  const collect = async () => {
+    for (let i = 0; i < 5; i++) {
+      await turn()
+      gc()
+    }
+    return process.memoryUsage().heapUsed
+  }
+  try {
+    for (let i = 0; i < 50; i++)
+      responses.push(await app.request(queryUrl('SELECT * FROM items')))
+    for (let i = 0; i < 100; i++) {
+      notify()
+      await turn()
+    }
+    const before = await collect()
+    for (let i = 0; i < 4000; i++) {
+      notify()
+      await turn()
+    }
+    const growth = (await collect()) - before
+    // The former lifetime abort promise retained about 60 MiB for this workload.
+    // Leave ample room for JIT/GC variation while detecting retained reactions.
+    assert.ok(
+      growth < 16 * 1024 * 1024,
+      `Live update heap grew by ${growth} bytes`,
+    )
+  } finally {
+    await Promise.all(responses.map((response) => response.body!.cancel()))
+    await turn()
+  }
+})

@@ -21,3 +21,8 @@ Hono is pinned to 4.13.14 in the indexer and resolved as Ponder's peer, includin
 the CORS fix described in [GHSA-8j4g-w8fx-2239](https://github.com/honojs/hono/security/advisories/GHSA-8j4g-w8fx-2239).
 The Docker dependency stage copies this directory before frozen installation;
 pnpm records the patch hash in the lockfile. CI recognizes patch-only changes.
+
+Abort waits are recreated for each table update and released afterward. This
+prevents a lifetime cancellation promise from retaining completed races for
+long-lived subscriptions; the regression keeps 50 streams open for 4,000
+notifications and checks post-GC heap growth before disconnect.
